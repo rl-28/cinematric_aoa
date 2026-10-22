@@ -23,6 +23,7 @@ import {
   SvdStats,
   SvdStep,
 } from "../engines/types";
+import { totalTicks } from "./selectors";
 
 export type PlaybackSpeed = 0.5 | 1 | 2 | 4;
 export type DatasetScale = "demo" | "100" | "500x300";
@@ -119,10 +120,10 @@ export const useSimStore = create<SimState>((set, get) => ({
   },
 
   play: () => {
-    const { tick, svdSteps, cbSteps } = get();
-    const totalTicks = Math.max(svdSteps.length, cbSteps.length);
+    const state = get();
+    const total = totalTicks(state);
     // If already at end, restart from tick 0
-    if (tick >= totalTicks - 1) {
+    if (state.tick >= total - 1) {
       set({ tick: 0, playing: true });
     } else {
       set({ playing: true });
@@ -147,15 +148,15 @@ export const useSimStore = create<SimState>((set, get) => ({
   },
 
   stepForward: () => {
-    const { tick, svdSteps, cbSteps } = get();
-    const totalTicks = Math.max(svdSteps.length, cbSteps.length);
-    if (tick < totalTicks - 1) {
-      const nextTick = tick + 1;
-      const isEnd = nextTick >= totalTicks - 1;
+    const state = get();
+    const total = totalTicks(state);
+    if (state.tick < total - 1) {
+      const nextTick = state.tick + 1;
+      const isEnd = nextTick >= total - 1;
       set({
         tick: nextTick,
         // Auto-pause upon reaching final tick
-        playing: isEnd ? false : get().playing,
+        playing: isEnd ? false : state.playing,
       });
     } else {
       set({ playing: false });
@@ -174,17 +175,24 @@ export const useSimStore = create<SimState>((set, get) => ({
   },
 
   seek: (targetTick: number) => {
-    const { svdSteps, cbSteps } = get();
-    const totalTicks = Math.max(svdSteps.length, cbSteps.length);
-    const clamped = Math.max(0, Math.min(totalTicks - 1, targetTick));
+    const state = get();
+    const total = totalTicks(state);
+    const clamped = Math.max(0, Math.min(total - 1, targetTick));
     set({
       tick: clamped,
-      playing: clamped >= totalTicks - 1 ? false : get().playing,
+      playing: clamped >= total - 1 ? false : state.playing,
     });
   },
 
   setColdStart: (active: boolean) => {
-    set({ coldStart: active });
+    const currentState = get();
+    const nextState = { ...currentState, coldStart: active };
+    const maxTick = Math.max(0, totalTicks(nextState) - 1);
+    set({
+      coldStart: active,
+      tick: Math.min(currentState.tick, maxTick),
+      playing: currentState.tick >= maxTick ? false : currentState.playing,
+    });
   },
 
   setDatasetScale: async (scale: DatasetScale) => {
@@ -240,7 +248,6 @@ export const useSimStore = create<SimState>((set, get) => ({
 
   loadRuns: () => {
     const { svd, content } = getInitialRuns();
-    const totalTicks = Math.max(svd.steps.length, content.steps.length);
     const currentTick = get().tick;
 
     set({
@@ -250,7 +257,11 @@ export const useSimStore = create<SimState>((set, get) => ({
       cbResult: content.result,
       svdStats: svd.stats,
       cbStats: content.stats,
-      tick: Math.min(currentTick, Math.max(0, totalTicks - 1)),
+    });
+
+    const total = totalTicks(get());
+    set({
+      tick: Math.min(currentTick, Math.max(0, total - 1)),
     });
   },
 }));

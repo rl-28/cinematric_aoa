@@ -9,6 +9,7 @@ import {
   comparedCandidatesAtTick,
   revealedContentRecommendations,
   isCbFinishedWaiting,
+  visibleCbSteps,
 } from "@/lib/sim/selectors";
 import { MOVIES, Movie } from "@/lib/data/movies";
 import { TokenizeView } from "./TokenizeView";
@@ -19,7 +20,7 @@ import { RankListView } from "./RankListView";
 export const VectorGraph: React.FC = () => {
   const store = useSimStore();
   const currentStep = currentCbStep(store);
-  const cbSteps = store.cbSteps;
+  const cbSteps = visibleCbSteps(store);
   const execMs = revealedExecMs(store, "cb");
   const comparedMap = comparedCandidatesAtTick(store);
   const topRecommendations = revealedContentRecommendations(store);
@@ -350,8 +351,8 @@ export const VectorGraph: React.FC = () => {
                 })()
               )}
 
-              {/* Movie Nodes (All 14) */}
-              {MOVIES.map((movie) => {
+              {/* Movie Nodes */}
+              {(store.coldStart ? MOVIES : MOVIES.filter((m) => !m.cold)).map((movie) => {
                 const coord = coordinates2D[movie.id];
                 if (!coord) return null;
 

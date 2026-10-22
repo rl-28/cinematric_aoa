@@ -2,6 +2,7 @@
 
 import React from "react";
 import { MOVIES } from "@/lib/data/movies";
+import { useSimStore } from "@/lib/sim/store";
 
 interface TokenizeViewProps {
   tokensByMovie?: Record<string, string[]>;
@@ -12,10 +13,14 @@ export const TokenizeView: React.FC<TokenizeViewProps> = ({
   tokensByMovie = {},
   vocabSize = 112,
 }) => {
-  // Feature two representative movies: Chronopolis (m14 cold) and Inception (m1 rated)
+  const coldStart = useSimStore((s) => s.coldStart);
+
+  // Feature two representative movies
   const featuredMovies = [
     { id: "m1", title: "Inception", isCold: false, desc: "Catalog Movie (Rated 5★ by Alex)" },
-    { id: "m14", title: "Chronopolis", isCold: true, desc: "Cold-Start Item (0 ratings in dataset)" },
+    ...(coldStart
+      ? [{ id: "m14", title: "Chronopolis", isCold: true, desc: "Cold-Start Item (0 ratings in dataset)" }]
+      : [{ id: "m2", title: "Interstellar", isCold: false, desc: "Catalog Movie (Sci-Fi, rated 5★)" }]),
   ];
 
   const getNamespaceStyle = (token: string) => {

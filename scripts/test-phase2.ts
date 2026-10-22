@@ -16,6 +16,8 @@ import {
   revealedExecMs,
   totalTicks,
   unrankableAtTick,
+  visibleSvdSteps,
+  visibleCbSteps,
 } from "../lib/sim/selectors";
 import { useSimStore } from "../lib/sim/store";
 
@@ -88,26 +90,69 @@ async function main() {
   console.log("\n-----------------------------------------------------------------");
   console.log("2. Cold-Start Toggle Selector Verification (Chronopolis m14)");
   console.log("-----------------------------------------------------------------");
-  useSimStore.getState().seek(total - 1); // at rank step
 
   // A. coldStart ON
   useSimStore.getState().setColdStart(true);
+  const stateOn = useSimStore.getState();
+  const ticksOn = totalTicks(stateOn);
+  const svdStepsOn = visibleSvdSteps(stateOn);
+  const cbStepsOn = visibleCbSteps(stateOn);
+  useSimStore.getState().seek(ticksOn - 1); // at final rank step (tick 13)
+
   let recs = revealedContentRecommendations(useSimStore.getState());
   const hasColdWhenOn = recs.some((r) => r.movieId === "m14");
+  const unrankableOn = unrankableAtTick(useSimStore.getState());
+
   console.log(`ColdStart = ON :`);
+  console.log(`  - Total Sim Ticks : ${ticksOn} (Expected: 14)`);
+  console.log(`  - SVD Visible Steps: ${svdStepsOn.length} (Expected: 14)`);
+  console.log(`  - CB Visible Steps : ${cbStepsOn.length} (Expected: 12)`);
+  console.log(`  - Current Tick    : ${useSimStore.getState().tick} (Expected: 13)`);
   console.log(`  - Chronopolis present in Content recommendations: ${hasColdWhenOn}`);
+  console.log(`  - SVD unrankable items: ${unrankableOn.length} (${unrankableOn[0]?.title})`);
   console.log(`  - Content Rank #1: ${recs[0]?.title} (Score: ${recs[0]?.score.toFixed(4)})`);
+
+  if (ticksOn !== 14 || svdStepsOn.length !== 14 || cbStepsOn.length !== 12 || !hasColdWhenOn || unrankableOn.length !== 1) {
+    throw new Error("Assertion failed for ColdStart ON state!");
+  }
 
   // B. coldStart OFF
+  // Toggle off while tick is at 13 -> must clamp tick to 12
   useSimStore.getState().setColdStart(false);
-  recs = revealedContentRecommendations(useSimStore.getState());
+  const stateOff = useSimStore.getState();
+  const ticksOff = totalTicks(stateOff);
+  const svdStepsOff = visibleSvdSteps(stateOff);
+  const cbStepsOff = visibleCbSteps(stateOff);
+  const tickAfterToggle = stateOff.tick;
+
+  recs = revealedContentRecommendations(stateOff);
   const hasColdWhenOff = recs.some((r) => r.movieId === "m14");
+  const unrankableOff = unrankableAtTick(stateOff);
+
   console.log(`ColdStart = OFF:`);
+  console.log(`  - Total Sim Ticks : ${ticksOff} (Expected: 13)`);
+  console.log(`  - SVD Visible Steps: ${svdStepsOff.length} (Expected: 13)`);
+  console.log(`  - CB Visible Steps : ${cbStepsOff.length} (Expected: 11)`);
+  console.log(`  - Clamped Tick    : ${tickAfterToggle} (Expected: 12)`);
   console.log(`  - Chronopolis present in Content recommendations: ${hasColdWhenOff} (Hidden!)`);
+  console.log(`  - SVD unrankable items: ${unrankableOff.length} (Expected: 0)`);
   console.log(`  - Content Rank #1: ${recs[0]?.title} (Score: ${recs[0]?.score.toFixed(4)})`);
 
-  // Restore
+  // Confirm m14 dot_product step removed from SVD
+  const hasM14Svd = svdStepsOff.some((s) => s.kind === "dot_product" && s.payload.movieId === "m14");
+  // Confirm m14 compare step removed from CB
+  const hasM14Cb = cbStepsOff.some((s) => s.kind === "compare" && s.payload.candidateId === "m14");
+
+  console.log(`  - SVD has m14 dot_product step: ${hasM14Svd} (Expected: false)`);
+  console.log(`  - CB has m14 compare step: ${hasM14Cb} (Expected: false)`);
+
+  if (ticksOff !== 13 || svdStepsOff.length !== 13 || cbStepsOff.length !== 11 || tickAfterToggle !== 12 || hasColdWhenOff || unrankableOff.length !== 0 || hasM14Svd || hasM14Cb) {
+    throw new Error("Assertion failed for ColdStart OFF state!");
+  }
+
+  // C. Restore coldStart ON
   useSimStore.getState().setColdStart(true);
+  console.log(`Restored ColdStart = ON (Total Ticks: ${totalTicks(useSimStore.getState())})`);
 
   // -----------------------------------------------------------------
   // 3. Playback Controls Verification

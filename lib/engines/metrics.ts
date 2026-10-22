@@ -142,6 +142,18 @@ export function computeMetrics(
   };
 }
 
+let cachedMetricsResult: MetricsResult | null = null;
+
+/**
+ * Returns cached offline metrics for the demo dataset (Precision@5, warmed medians, memory, cold-start score).
+ */
+export function getOfflineMetrics(): MetricsResult {
+  if (!cachedMetricsResult) {
+    cachedMetricsResult = computeMetrics(5);
+  }
+  return cachedMetricsResult;
+}
+
 /**
  * Benchmark runner for synthetic datasets at varying scales:
  * Supports arbitrary sizes including 50×30, 100×60, and 500 users × 300 movies.

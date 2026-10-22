@@ -15,7 +15,9 @@ export const TfidfView: React.FC<TfidfViewProps> = ({ vocabulary = [] }) => {
   // Movie m1 (Inception) is index 0; m14 (Chronopolis) is index 13
   const featured = [
     { id: "m1", title: "Inception", idx: 0, isCold: false },
-    { id: "m14", title: "Chronopolis", idx: 13, isCold: true },
+    ...(store.coldStart
+      ? [{ id: "m14", title: "Chronopolis", idx: 13, isCold: true }]
+      : [{ id: "m2", title: "Interstellar", idx: 1, isCold: false }]),
   ];
 
   const getTopTokensForMovie = (rowIdx: number) => {

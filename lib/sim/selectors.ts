@@ -12,10 +12,80 @@ import {
 import { SimState } from "./store";
 
 /**
+ * Visible SVD steps respecting the coldStart toggle.
+ * When coldStart is OFF:
+ *   - Drops the m14 dot_product step
+ *   - Strips m14 from rank recommendations and unrankable payloads
+ */
+export function visibleSvdSteps(state: SimState): SvdStep[] {
+  if (state.coldStart) {
+    return state.svdSteps;
+  }
+
+  const result: SvdStep[] = [];
+  for (const s of state.svdSteps) {
+    if (s.kind === "dot_product" && s.payload.movieId === "m14") {
+      continue;
+    }
+    if (s.kind === "rank") {
+      result.push({
+        ...s,
+        payload: {
+          ...s.payload,
+          recommendations: s.payload.recommendations.filter(
+            (r) => r.movieId !== "m14"
+          ),
+          unrankable: s.payload.unrankable
+            ? s.payload.unrankable.filter((u) => u.itemId !== "m14")
+            : [],
+        },
+      });
+    } else {
+      result.push(s);
+    }
+  }
+  return result;
+}
+
+/**
+ * Visible Content-Based steps respecting the coldStart toggle.
+ * When coldStart is OFF:
+ *   - Drops the m14 compare step
+ *   - Strips m14 from rank recommendations
+ */
+export function visibleCbSteps(state: SimState): ContentStep[] {
+  if (state.coldStart) {
+    return state.cbSteps;
+  }
+
+  const result: ContentStep[] = [];
+  for (const s of state.cbSteps) {
+    if (s.kind === "compare" && s.payload.candidateId === "m14") {
+      continue;
+    }
+    if (s.kind === "rank") {
+      result.push({
+        ...s,
+        payload: {
+          ...s.payload,
+          recommendations: s.payload.recommendations.filter(
+            (r) => r.movieId !== "m14" && !r.isCold
+          ),
+        },
+      });
+    } else {
+      result.push(s);
+    }
+  }
+  return result;
+}
+
+/**
  * Returns the total number of simulation ticks required to complete both traces.
+ * Respects visible step counts when cold-start toggle is disabled.
  */
 export function totalTicks(state: SimState): number {
-  return Math.max(state.svdSteps.length, state.cbSteps.length);
+  return Math.max(visibleSvdSteps(state).length, visibleCbSteps(state).length);
 }
 
 /**
@@ -32,9 +102,10 @@ export function progress(state: SimState): number {
  * Clamps to the last step once SVD completes.
  */
 export function currentSvdStep(state: SimState): SvdStep | null {
-  if (state.svdSteps.length === 0) return null;
-  const idx = Math.min(state.tick, state.svdSteps.length - 1);
-  return state.svdSteps[idx];
+  const steps = visibleSvdSteps(state);
+  if (steps.length === 0) return null;
+  const idx = Math.min(state.tick, steps.length - 1);
+  return steps[idx];
 }
 
 /**
@@ -42,23 +113,26 @@ export function currentSvdStep(state: SimState): SvdStep | null {
  * Clamps to the last step once Content-Based completes.
  */
 export function currentCbStep(state: SimState): ContentStep | null {
-  if (state.cbSteps.length === 0) return null;
-  const idx = Math.min(state.tick, state.cbSteps.length - 1);
-  return state.cbSteps[idx];
+  const steps = visibleCbSteps(state);
+  if (steps.length === 0) return null;
+  const idx = Math.min(state.tick, steps.length - 1);
+  return steps[idx];
 }
 
 /**
  * Whether the SVD visualizer has executed all its steps.
  */
 export function isSvdDone(state: SimState): boolean {
-  return state.svdSteps.length > 0 && state.tick >= state.svdSteps.length - 1;
+  const steps = visibleSvdSteps(state);
+  return steps.length > 0 && state.tick >= steps.length - 1;
 }
 
 /**
  * Whether the Content-Based visualizer has executed all its steps.
  */
 export function isCbDone(state: SimState): boolean {
-  return state.cbSteps.length > 0 && state.tick >= state.cbSteps.length - 1;
+  const steps = visibleCbSteps(state);
+  return steps.length > 0 && state.tick >= steps.length - 1;
 }
 
 /**
@@ -68,12 +142,14 @@ export function isCbDone(state: SimState): boolean {
  */
 export function revealedExecMs(state: SimState, algo: "svd" | "content" | "cb"): number {
   if (algo === "svd") {
-    const count = Math.min(state.tick + 1, state.svdSteps.length);
-    const sum = state.svdSteps.slice(0, count).reduce((acc, s) => acc + s.ms, 0);
+    const steps = visibleSvdSteps(state);
+    const count = Math.min(state.tick + 1, steps.length);
+    const sum = steps.slice(0, count).reduce((acc, s) => acc + s.ms, 0);
     return Number(sum.toFixed(3));
   } else {
-    const count = Math.min(state.tick + 1, state.cbSteps.length);
-    const sum = state.cbSteps.slice(0, count).reduce((acc, s) => acc + s.ms, 0);
+    const steps = visibleCbSteps(state);
+    const count = Math.min(state.tick + 1, steps.length);
+    const sum = steps.slice(0, count).reduce((acc, s) => acc + s.ms, 0);
     return Number(sum.toFixed(3));
   }
 }
@@ -102,13 +178,7 @@ export function revealedContentRecommendations(
 ): ContentRecommendation[] {
   const step = currentCbStep(state);
   if (!step || step.kind !== "rank") return [];
-
-  const allRecs = step.payload.recommendations;
-  if (!state.coldStart) {
-    // Hide cold items when cold-start toggle is disabled
-    return allRecs.filter((rec) => !rec.isCold && rec.movieId !== "m14");
-  }
-  return allRecs;
+  return step.payload.recommendations;
 }
 
 /**
@@ -124,11 +194,12 @@ export interface PredictedCellInfo {
 
 export function predictedCellsAtTick(state: SimState): Map<string, PredictedCellInfo> {
   const map = new Map<string, PredictedCellInfo>();
-  if (state.svdSteps.length === 0) return map;
+  const steps = visibleSvdSteps(state);
+  if (steps.length === 0) return map;
 
-  const currentIdx = Math.min(state.tick, state.svdSteps.length - 1);
+  const currentIdx = Math.min(state.tick, steps.length - 1);
   for (let i = 0; i <= currentIdx; i++) {
-    const s = state.svdSteps[i];
+    const s = steps[i];
     if (s.kind === "dot_product") {
       map.set(s.payload.movieId, {
         movieId: s.payload.movieId,
@@ -145,8 +216,9 @@ export function predictedCellsAtTick(state: SimState): Map<string, PredictedCell
  * Returns the raw matrix from the initial load step if available.
  */
 export function rawMatrixAtTick(state: SimState): (number | null)[][] | null {
-  if (state.svdSteps.length > 0 && state.svdSteps[0].kind === "load") {
-    return state.svdSteps[0].payload.rawMatrix;
+  const steps = visibleSvdSteps(state);
+  if (steps.length > 0 && steps[0].kind === "load") {
+    return steps[0].payload.rawMatrix;
   }
   return null;
 }
@@ -157,10 +229,11 @@ export function rawMatrixAtTick(state: SimState): (number | null)[][] | null {
 export function baselineAtTick(
   state: SimState
 ): { mu: number; bu: number[]; bi: number[] } | null {
-  if (state.svdSteps.length === 0) return null;
-  const currentIdx = Math.min(state.tick, state.svdSteps.length - 1);
+  const steps = visibleSvdSteps(state);
+  if (steps.length === 0) return null;
+  const currentIdx = Math.min(state.tick, steps.length - 1);
   for (let i = 0; i <= currentIdx; i++) {
-    const s = state.svdSteps[i];
+    const s = steps[i];
     if (s.kind === "baseline") {
       return s.payload;
     }
@@ -174,10 +247,11 @@ export function baselineAtTick(
 export function latentFactorsAtTick(
   state: SimState
 ): { P: number[][]; Q: number[][]; sk: number[] } | null {
-  if (state.svdSteps.length === 0) return null;
-  const currentIdx = Math.min(state.tick, state.svdSteps.length - 1);
+  const steps = visibleSvdSteps(state);
+  if (steps.length === 0) return null;
+  const currentIdx = Math.min(state.tick, steps.length - 1);
   for (let i = 0; i <= currentIdx; i++) {
-    const s = state.svdSteps[i];
+    const s = steps[i];
     if (s.kind === "truncate") {
       return { P: s.payload.P, Q: s.payload.Q, sk: s.payload.sk };
     }
@@ -209,17 +283,18 @@ export interface ComparedCandidateInfo {
 
 /**
  * Returns a map of unrated candidates evaluated by Content-Based engine up to current tick.
- * Derived by scanning cbSteps[0..currentTick].
+ * Derived by scanning visibleCbSteps[0..currentTick].
  */
 export function comparedCandidatesAtTick(
   state: SimState
 ): Map<string, ComparedCandidateInfo> {
   const map = new Map<string, ComparedCandidateInfo>();
-  if (state.cbSteps.length === 0) return map;
+  const steps = visibleCbSteps(state);
+  if (steps.length === 0) return map;
 
-  const currentIdx = Math.min(state.tick, state.cbSteps.length - 1);
+  const currentIdx = Math.min(state.tick, steps.length - 1);
   for (let i = 0; i <= currentIdx; i++) {
-    const s = state.cbSteps[i];
+    const s = steps[i];
     if (s.kind === "compare") {
       map.set(s.payload.candidateId, {
         candidateId: s.payload.candidateId,
@@ -238,11 +313,12 @@ export function comparedCandidatesAtTick(
 
 /**
  * Whether the Content-Based pipeline is done and waiting for the longer SVD pipeline to finish.
- * CB has 12 steps (ticks 0..11) while SVD has 14 steps (ticks 0..13).
+ * CB has 12 steps (ticks 0..11) while SVD has 14 steps (ticks 0..13) when coldStart is ON;
+ * CB has 11 steps (ticks 0..10) while SVD has 13 steps (ticks 0..12) when coldStart is OFF.
  */
 export function isCbFinishedWaiting(state: SimState): boolean {
-  const cbTotal = state.cbSteps.length;
-  const svdTotal = state.svdSteps.length;
+  const cbTotal = visibleCbSteps(state).length;
+  const svdTotal = visibleSvdSteps(state).length;
   return (
     cbTotal > 0 &&
     state.tick >= cbTotal - 1 &&

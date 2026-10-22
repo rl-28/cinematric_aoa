@@ -14,6 +14,7 @@ interface MatrixGridProps {
   predictedMap?: Map<string, PredictedCellInfo>;
   activeCell?: { userIdx: number; itemIdx: number; movieId: string } | null;
   highlightTargetUser?: boolean;
+  showColdStart?: boolean;
 }
 
 export const MatrixGrid: React.FC<MatrixGridProps> = ({
@@ -24,9 +25,10 @@ export const MatrixGrid: React.FC<MatrixGridProps> = ({
   predictedMap,
   activeCell,
   highlightTargetUser = true,
+  showColdStart = true,
 }) => {
   const catalogMovies = MOVIES.filter((m) => !m.cold);
-  const coldMovie = MOVIES.find((m) => m.cold);
+  const coldMovie = showColdStart ? MOVIES.find((m) => m.cold) : null;
 
   return (
     <div className="w-full overflow-x-auto select-none font-mono text-xs">

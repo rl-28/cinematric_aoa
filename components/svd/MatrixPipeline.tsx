@@ -9,6 +9,7 @@ import {
   predictedCellsAtTick,
   baselineAtTick,
   rawMatrixAtTick,
+  visibleSvdSteps,
 } from "@/lib/sim/selectors";
 import { MatrixGrid } from "./MatrixGrid";
 import { DecompositionView } from "./DecompositionView";
@@ -19,7 +20,7 @@ import { RankView } from "./RankView";
 export const MatrixPipeline: React.FC = () => {
   const store = useSimStore();
   const currentStep = currentSvdStep(store);
-  const svdSteps = store.svdSteps;
+  const svdSteps = visibleSvdSteps(store);
   const execMs = revealedExecMs(store, "svd");
 
   // Derive pure state from store history
@@ -112,9 +113,13 @@ export const MatrixPipeline: React.FC = () => {
                 <div className="p-2.5 rounded bg-surface border border-neutral-800 text-[11px] text-muted font-sans">
                   Observed ratings matrix (10 users × 13 movies). Target user{" "}
                   <strong className="text-accent font-mono">Alex Chen</strong> is outlined in red.
-                  Column <strong className="text-amber-400 font-mono">m14 (Chronopolis)</strong> is unrated (cold-start).
+                  {store.coldStart && (
+                    <>
+                      {" "}Column <strong className="text-amber-400 font-mono">m14 (Chronopolis)</strong> is unrated (cold-start).
+                    </>
+                  )}
                 </div>
-                <MatrixGrid mode="raw" rawMatrix={rawMatrix} />
+                <MatrixGrid mode="raw" rawMatrix={rawMatrix} showColdStart={store.coldStart} />
               </div>
             )}
 
@@ -139,6 +144,7 @@ export const MatrixPipeline: React.FC = () => {
                   mode="baseline"
                   rawMatrix={rawMatrix}
                   baseline={currentStep.payload}
+                  showColdStart={store.coldStart}
                 />
               </div>
             )}
@@ -164,6 +170,7 @@ export const MatrixPipeline: React.FC = () => {
                   rawMatrix={rawMatrix}
                   residualMatrix={currentStep.payload.residualMatrix}
                   baseline={baseline}
+                  showColdStart={store.coldStart}
                 />
               </div>
             )}
@@ -209,6 +216,7 @@ export const MatrixPipeline: React.FC = () => {
                     mode="predictions"
                     rawMatrix={rawMatrix}
                     predictedMap={predictedMap}
+                    showColdStart={store.coldStart}
                     activeCell={{
                       userIdx: currentStep.payload.userIdx,
                       itemIdx: currentStep.payload.itemIdx,
@@ -234,6 +242,7 @@ export const MatrixPipeline: React.FC = () => {
                     mode="predictions"
                     rawMatrix={rawMatrix}
                     predictedMap={predictedMap}
+                    showColdStart={store.coldStart}
                   />
                 </div>
               </div>
