@@ -66,8 +66,13 @@ export interface SimState {
   loadRuns: () => void;
 }
 
-// Initial demo run to populate initial store state
+// Initial demo run to populate initial store state (1 warmup run discarded, then measured run stored)
 function getInitialRuns(): { svd: SvdRunOutput; content: ContentRunOutput } {
+  // Warmup run to prime V8 JIT compiler
+  runSvd();
+  runContent();
+
+  // Warmed run stored for replay
   const svd = runSvd();
   const content = runContent();
   return { svd, content };

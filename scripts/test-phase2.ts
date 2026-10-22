@@ -5,6 +5,7 @@
  * and asynchronous benchmark scale caching.
  */
 
+import { computeMetrics } from "../lib/engines/metrics";
 import {
   currentCbStep,
   currentSvdStep,
@@ -69,6 +70,17 @@ async function main() {
       });
     }
   }
+
+  // Check consistency between revealedExecMs at final tick and computeMetrics
+  const finalState = useSimStore.getState();
+  const svdRevealedFinal = revealedExecMs(finalState, "svd");
+  const cbRevealedFinal = revealedExecMs(finalState, "content");
+  const metrics = computeMetrics(5);
+
+  console.log("\nTiming Consistency Check (Revealed Final Tick vs computeMetrics):");
+  console.log(`  - Final Tick Revealed: SVD = ${svdRevealedFinal} ms | CB = ${cbRevealedFinal} ms (SVD faster: ${svdRevealedFinal < cbRevealedFinal})`);
+  console.log(`  - computeMetrics:      SVD = ${metrics.svd.execMs} ms | CB = ${metrics.content.execMs} ms (SVD faster: ${metrics.svd.execMs < metrics.content.execMs})`);
+  console.log(`  - Ordering Consistent: ${ (svdRevealedFinal < cbRevealedFinal) === (metrics.svd.execMs < metrics.content.execMs) ? "YES (Consistent!)" : "NO" }`);
 
   // -----------------------------------------------------------------
   // 2. Cold-Start Toggle & Selector Filtering (No Engine Re-Run)

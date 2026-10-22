@@ -151,7 +151,7 @@ export function computeMetrics(
 export function scaleBenchmark(
   numUsers: number = 500,
   numMovies?: number,
-  runs: number = 5
+  runs?: number
 ): BenchmarkResult {
   const actualMovies =
     numMovies ??
@@ -159,7 +159,8 @@ export function scaleBenchmark(
       ? 300
       : Math.max(10, Math.round(numUsers * 0.6)));
 
-  const effectiveRuns = numUsers >= 500 ? Math.min(3, runs) : runs;
+  // Use runs=5 for scales up to 100, but runs=2 for 500x300 (1 warmup + 2 timed) to stay under ~2.5s
+  const effectiveRuns = runs ?? (numUsers >= 500 ? 2 : 5);
 
   // Shared pool of genres, directors, and keywords to simulate real catalog tag distribution
   const genrePool = [
