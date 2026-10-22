@@ -10,7 +10,7 @@ interface TokenizeViewProps {
 
 export const TokenizeView: React.FC<TokenizeViewProps> = ({
   tokensByMovie = {},
-  vocabSize = 67,
+  vocabSize = 112,
 }) => {
   // Feature two representative movies: Chronopolis (m14 cold) and Inception (m1 rated)
   const featuredMovies = [

@@ -159,7 +159,7 @@ export const VectorGraph: React.FC = () => {
         {kind === "tokenize" && currentStep && currentStep.kind === "tokenize" && (
           <TokenizeView
             tokensByMovie={currentStep.payload.tokensByMovie}
-            vocabSize={store.cbResult?.vocabulary.length ?? 67}
+            vocabSize={store.cbResult?.vocabulary.length ?? 112}
           />
         )}
 
@@ -189,7 +189,10 @@ export const VectorGraph: React.FC = () => {
         )}
 
         {kind === "compare" && currentStep && currentStep.kind === "compare" && (
-          <CompareCard payload={currentStep.payload} />
+          <CompareCard
+            payload={currentStep.payload}
+            vocabDim={store.cbResult?.vocabulary.length ?? 112}
+          />
         )}
 
         {kind === "rank" && (
@@ -520,7 +523,9 @@ export const VectorGraph: React.FC = () => {
           </div>
 
           <div className="flex justify-between text-[11px] text-muted font-sans px-1">
-            <span>* Points are 2D PCA projections of 67-dimensional L2-normalized TF-IDF vectors.</span>
+            <span>
+              * Points are 2D PCA projections of {store.cbResult?.vocabulary.length ?? 112}-dimensional L2-normalized TF-IDF vectors.
+            </span>
             <span className="text-amber-400 font-medium">
               Chronopolis (m14) is embedded directly from metadata.
             </span>

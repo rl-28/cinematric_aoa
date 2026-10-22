@@ -6,9 +6,13 @@ import { ContentComparePayload } from "@/lib/engines/types";
 
 interface CompareCardProps {
   payload: ContentComparePayload;
+  vocabDim?: number;
 }
 
-export const CompareCard: React.FC<CompareCardProps> = ({ payload }) => {
+export const CompareCard: React.FC<CompareCardProps> = ({
+  payload,
+  vocabDim = 112,
+}) => {
   const {
     candidateId,
     title,
@@ -98,7 +102,7 @@ export const CompareCard: React.FC<CompareCardProps> = ({ payload }) => {
       <div className="p-2.5 rounded bg-neutral-900/40 border border-neutral-800 text-[11px] font-sans text-neutral-400 flex items-start gap-2">
         <span className="text-blue-400 text-sm">📐</span>
         <p className="leading-relaxed">
-          <strong className="text-neutral-200">Honesty Note:</strong> The angle shown (<span className="text-amber-300 font-mono">{angleDeg.toFixed(1)}°</span>) is the mathematically authentic angle in full 67-dimensional token space. The 2D map below is a PCA projection, so the visual arc is drawn schematically — trust the payload number as the real value.
+          <strong className="text-neutral-200">Honesty Note:</strong> The angle shown (<span className="text-amber-300 font-mono">{angleDeg.toFixed(1)}°</span>) is the mathematically authentic angle in full {vocabDim}-dimensional token space. The 2D map below is a PCA projection, so the visual arc is drawn schematically — trust the payload number as the real value.
         </p>
       </div>
 
