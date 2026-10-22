@@ -5,6 +5,7 @@ import { useSimStore } from "@/lib/sim/store";
 import { useReplay } from "@/lib/sim/useReplay";
 import { totalTicks } from "@/lib/sim/selectors";
 import { MatrixPipeline } from "@/components/svd/MatrixPipeline";
+import { VectorGraph } from "@/components/cb/VectorGraph";
 
 export default function SimulatorPage() {
   // Drive the shared clock via requestAnimationFrame
@@ -12,19 +13,6 @@ export default function SimulatorPage() {
 
   const store = useSimStore();
   const maxTick = Math.max(0, totalTicks(store) - 1);
-
-  React.useEffect(() => {
-    if (typeof window !== "undefined") {
-      const params = new URLSearchParams(window.location.search);
-      const tickParam = params.get("tick");
-      if (tickParam !== null) {
-        const t = parseInt(tickParam, 10);
-        if (!isNaN(t)) {
-          useSimStore.getState().seek(t);
-        }
-      }
-    }
-  }, []);
 
   return (
     <div className="flex flex-col min-h-screen bg-[#141414] text-white">
@@ -136,26 +124,9 @@ export default function SimulatorPage() {
           <MatrixPipeline />
         </section>
 
-        {/* Right Panel: Content-Based Visualizer Placeholder */}
-        <section className="w-full lg:w-1/2 flex flex-col h-[calc(100vh-80px)] rounded-lg border border-dashed border-neutral-800 bg-[#161616]/60 p-6 items-center justify-center text-center">
-          <div className="max-w-md flex flex-col items-center gap-3">
-            <div className="w-12 h-12 rounded-full bg-neutral-900 border border-neutral-800 flex items-center justify-center text-xl text-neutral-500 font-mono">
-              Vector
-            </div>
-            <h3 className="text-white font-bold font-sans text-base">
-              Content-Based Vector Space Visualizer
-            </h3>
-            <p className="text-muted text-xs leading-relaxed font-sans">
-              2D TF-IDF PCA projection, feature vector graph, and cosine similarity angular arcs.
-              Will be implemented in <strong className="text-white">Phase 4</strong>.
-            </p>
-            <div className="flex items-center gap-2 mt-2 px-3 py-1.5 rounded bg-neutral-900 border border-neutral-800 font-mono text-[11px] text-neutral-400">
-              <span>Sync Status:</span>
-              <span className="text-emerald-400 font-semibold">
-                Clock tick {store.tick} ready
-              </span>
-            </div>
-          </div>
+        {/* Right Panel: Content-Based Vector Space Visualizer (50% Width) */}
+        <section className="w-full lg:w-1/2 flex flex-col h-[calc(100vh-80px)]">
+          <VectorGraph />
         </section>
       </main>
     </div>

@@ -66,7 +66,7 @@ export function isCbDone(state: SimState): boolean {
  * Display time is independent of compute time: ms is the actual measured
  * compute time accumulated progressively as each stage plays.
  */
-export function revealedExecMs(state: SimState, algo: "svd" | "content"): number {
+export function revealedExecMs(state: SimState, algo: "svd" | "content" | "cb"): number {
   if (algo === "svd") {
     const count = Math.min(state.tick + 1, state.svdSteps.length);
     const sum = state.svdSteps.slice(0, count).reduce((acc, s) => acc + s.ms, 0);
@@ -191,4 +191,62 @@ export function latentFactorsAtTick(
  */
 export function isItemHighlighted(state: SimState, movieId: string): boolean {
   return Boolean(state.coldStart && movieId === "m14");
+}
+
+/**
+ * Information for candidates evaluated by Content-Based cosine similarity up to current tick.
+ */
+export interface ComparedCandidateInfo {
+  candidateId: string;
+  title: string;
+  cosine: number;
+  angleDeg: number;
+  dot: number;
+  normA: number;
+  normB: number;
+  isCold?: boolean;
+}
+
+/**
+ * Returns a map of unrated candidates evaluated by Content-Based engine up to current tick.
+ * Derived by scanning cbSteps[0..currentTick].
+ */
+export function comparedCandidatesAtTick(
+  state: SimState
+): Map<string, ComparedCandidateInfo> {
+  const map = new Map<string, ComparedCandidateInfo>();
+  if (state.cbSteps.length === 0) return map;
+
+  const currentIdx = Math.min(state.tick, state.cbSteps.length - 1);
+  for (let i = 0; i <= currentIdx; i++) {
+    const s = state.cbSteps[i];
+    if (s.kind === "compare") {
+      map.set(s.payload.candidateId, {
+        candidateId: s.payload.candidateId,
+        title: s.payload.title,
+        cosine: s.payload.cosine,
+        angleDeg: s.payload.angleDeg,
+        dot: s.payload.dot,
+        normA: s.payload.normA,
+        normB: s.payload.normB,
+        isCold: s.payload.isCold,
+      });
+    }
+  }
+  return map;
+}
+
+/**
+ * Whether the Content-Based pipeline is done and waiting for the longer SVD pipeline to finish.
+ * CB has 12 steps (ticks 0..11) while SVD has 14 steps (ticks 0..13).
+ */
+export function isCbFinishedWaiting(state: SimState): boolean {
+  const cbTotal = state.cbSteps.length;
+  const svdTotal = state.svdSteps.length;
+  return (
+    cbTotal > 0 &&
+    state.tick >= cbTotal - 1 &&
+    svdTotal > cbTotal &&
+    state.tick < svdTotal - 1
+  );
 }

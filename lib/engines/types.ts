@@ -125,6 +125,7 @@ export interface ContentResult {
   vocabulary: string[];
   tfidfMatrix: number[][];
   userProfile: number[];
+  profileCoordinate2D?: { x: number; y: number };
   coordinates2D: Record<string, MovieCoordinate2D>;
   similarities: Array<{ movieId: string; score: number; isCold?: boolean }>;
   recommendations: ContentRecommendation[];
@@ -140,7 +141,7 @@ export interface ContentStats {
 export type ContentStep =
   | Step<"tokenize", { tokensByMovie: Record<string, string[]> }>
   | Step<"tfidf", { vocabulary: string[]; matrixPreview: number[][] }>
-  | Step<"profile", { ratedMovieIds: string[]; weights: number[]; userProfile: number[] }>
+  | Step<"profile", { ratedMovieIds: string[]; weights: number[]; userProfile: number[]; profileCoordinate2D?: { x: number; y: number } }>
   | Step<"compare", ContentComparePayload>
   | Step<"rank", { recommendations: ContentRecommendation[] }>;
 

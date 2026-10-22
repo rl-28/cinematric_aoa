@@ -308,6 +308,16 @@ export function runContent(
   // Top 2 principal components: U_2 * Sigma_2
   const U_pca = pcaSvd.leftSingularVectors;
   const s_pca = pcaSvd.diagonal;
+  const V_pca = pcaSvd.rightSingularVectors;
+
+  // Project user profile using the exact same PCA components
+  let rawProfileX = 0;
+  let rawProfileY = 0;
+  for (let c = 0; c < V; c++) {
+    const diff = userProfile[c] - colMeans[c];
+    rawProfileX += diff * V_pca.get(c, 0);
+    rawProfileY += diff * V_pca.get(c, 1);
+  }
 
   const rawCoords: Array<{ id: string; x: number; y: number }> = [];
   let minX = Infinity;
@@ -325,6 +335,12 @@ export function runContent(
     if (y < minY) minY = y;
     if (y > maxY) maxY = y;
   }
+
+  // Include user profile in 2D coordinate bounds
+  if (rawProfileX < minX) minX = rawProfileX;
+  if (rawProfileX > maxX) maxX = rawProfileX;
+  if (rawProfileY < minY) minY = rawProfileY;
+  if (rawProfileY > maxY) maxY = rawProfileY;
 
   // Normalize coordinates to [0.08, 0.92] margin for pleasant SVG display
   const rangeX = maxX - minX || 1;
@@ -344,6 +360,22 @@ export function runContent(
       genres: m.genres,
       isCold: Boolean(m.cold),
     };
+  }
+
+  const normProfileX = Number((0.08 + 0.84 * ((rawProfileX - minX) / rangeX)).toFixed(4));
+  const normProfileY = Number((0.08 + 0.84 * ((rawProfileY - minY) / rangeY)).toFixed(4));
+  const profileCoordinate2D = { x: normProfileX, y: normProfileY };
+
+  coordinates2D["user_profile"] = {
+    x: normProfileX,
+    y: normProfileY,
+    title: "Alex's Profile",
+    genres: ["Sci-Fi", "Action"],
+  };
+
+  const profileStep = steps.find((s) => s.kind === "profile");
+  if (profileStep && profileStep.kind === "profile") {
+    profileStep.payload.profileCoordinate2D = profileCoordinate2D;
   }
 
   const totalExecMs = performance.now() - startTotal;
@@ -366,6 +398,7 @@ export function runContent(
     vocabulary,
     tfidfMatrix,
     userProfile,
+    profileCoordinate2D,
     coordinates2D,
     similarities: similarities.map((s) => ({
       movieId: s.movieId,
