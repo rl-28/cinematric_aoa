@@ -112,6 +112,80 @@ export function revealedContentRecommendations(
 }
 
 /**
+ * Returns a map of all predicted cells evaluated by SVD up to the current tick.
+ * Purely derived by scanning svdSteps[0..currentTick].
+ */
+export interface PredictedCellInfo {
+  movieId: string;
+  itemIdx: number;
+  prediction: number;
+  coldFallback?: boolean;
+}
+
+export function predictedCellsAtTick(state: SimState): Map<string, PredictedCellInfo> {
+  const map = new Map<string, PredictedCellInfo>();
+  if (state.svdSteps.length === 0) return map;
+
+  const currentIdx = Math.min(state.tick, state.svdSteps.length - 1);
+  for (let i = 0; i <= currentIdx; i++) {
+    const s = state.svdSteps[i];
+    if (s.kind === "dot_product") {
+      map.set(s.payload.movieId, {
+        movieId: s.payload.movieId,
+        itemIdx: s.payload.itemIdx,
+        prediction: s.payload.prediction,
+        coldFallback: s.payload.coldFallback,
+      });
+    }
+  }
+  return map;
+}
+
+/**
+ * Returns the raw matrix from the initial load step if available.
+ */
+export function rawMatrixAtTick(state: SimState): (number | null)[][] | null {
+  if (state.svdSteps.length > 0 && state.svdSteps[0].kind === "load") {
+    return state.svdSteps[0].payload.rawMatrix;
+  }
+  return null;
+}
+
+/**
+ * Returns the baseline parameters if revealed by or before the current tick.
+ */
+export function baselineAtTick(
+  state: SimState
+): { mu: number; bu: number[]; bi: number[] } | null {
+  if (state.svdSteps.length === 0) return null;
+  const currentIdx = Math.min(state.tick, state.svdSteps.length - 1);
+  for (let i = 0; i <= currentIdx; i++) {
+    const s = state.svdSteps[i];
+    if (s.kind === "baseline") {
+      return s.payload;
+    }
+  }
+  return null;
+}
+
+/**
+ * Returns truncated latent factor matrices P, Q, and sk if revealed by or before the current tick.
+ */
+export function latentFactorsAtTick(
+  state: SimState
+): { P: number[][]; Q: number[][]; sk: number[] } | null {
+  if (state.svdSteps.length === 0) return null;
+  const currentIdx = Math.min(state.tick, state.svdSteps.length - 1);
+  for (let i = 0; i <= currentIdx; i++) {
+    const s = state.svdSteps[i];
+    if (s.kind === "truncate") {
+      return { P: s.payload.P, Q: s.payload.Q, sk: s.payload.sk };
+    }
+  }
+  return null;
+}
+
+/**
  * Returns true if an item should be highlighted in visualizers
  * (e.g. cold-start movie Chronopolis m14 when cold-start mode is active).
  */
