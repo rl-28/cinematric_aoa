@@ -27,3 +27,13 @@ body {
   font-family: var(--font-inter), sans-serif;
   min-height: 100vh;
 }
+
+@keyframes sweep {
+  0% {
+    transform: translateX(-120%) skewX(-20deg);
+  }
+  100% {
+    transform: translateX(220%) skewX(-20deg);
+  }
+}
+

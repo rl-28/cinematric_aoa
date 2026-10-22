@@ -90,7 +90,7 @@ export type Step<K extends string, P> = {
 - **Phase 3**: SVD live visualizer (left panel) *(Completed)*
 - **Phase 4**: Content-based graph visualizer (right panel) *(Completed)*
 - **Phase 5**: Dashboard shell, control bar, metrics overlay, cold-start toggle *(Completed)*
-- **Phase 6**: Landing page, intro modal, algorithm cards, Launch CTA
+- **Phase 6**: Landing page, intro modal, algorithm cards, Launch CTA *(Completed)*
 - **Phase 7**: Polish, QA, Web Worker benchmark offload, deployment verification
 
 ---
