@@ -84,10 +84,23 @@ export type Step<K extends string, P> = {
 
 ## 4. Phase Plan
 - **Phase 0**: Scaffold, design tokens, routes, folder structure *(Completed)*
-- **Phase 1**: Dataset + SVD & Content engines + traces + metrics (The Brain)
-- **Phase 2**: Shared simulation clock & replay store
-- **Phase 3**: SVD live visualizer (left panel)
-- **Phase 4**: Content-based graph visualizer (right panel)
+- **Phase 1**: Dataset + SVD & Content engines + traces + metrics (The Brain) *(Completed)*
+- **Phase 2**: Shared simulation clock & replay store *(Completed)*
+- **Phase 2.5**: Warmed runs, scale benchmark tuning *(Completed)*
+- **Phase 3**: SVD live visualizer (left panel) *(Completed)*
+- **Phase 4**: Content-based graph visualizer (right panel) *(In progress)*
 - **Phase 5**: Dashboard shell, control bar, metrics overlay, cold-start toggle
 - **Phase 6**: Landing page, intro modal, algorithm cards, Launch CTA
-- **Phase 7**: Polish, QA, deployment verification
+- **Phase 7**: Polish, QA, Web Worker benchmark offload, deployment verification
+
+---
+
+## 5. Decisions Since Kickoff
+
+- **Cold-Start Item (Chronopolis, `m14`)**: SVD excludes it from top-5 recommendations and places it in a dedicated "unrankable" card ($Q = [0, 0]$, reverts to baseline only); Content-Based scores it normally using its metadata tokens and ranks it.
+- **Precision@5 Tie (0.40 vs 0.40)**: Precision@5 evaluated on the held-out split is tied at 0.40 vs 0.40. Do not tune data to force a difference. Present it honestly in educational copy as "equal accuracy, different strengths".
+- **Replay Timing vs. Benchmark Metrics**: Per-step replay timing reflects one warmed execution ("this run"); the metrics overlay benchmark displays the median of 5 runs. Label them differently in the UI to maintain clarity.
+- **Dataset Scale Scope & Web Worker**: The `datasetScale` selector affects only the benchmark readout, never the replay traces (replay always uses the small demo dataset). Because 500×300 takes several seconds, offload it to a Web Worker in Phase 7 to prevent main thread blocking.
+- **2D PCA Projection & True Angle**: The 2D PCA map is a lower-dimensional projection; the numerical angle shown in the UI must be the true angle computed in high-dimensional TF-IDF space from the payload, with the visual arc rendered schematically.
+- **Step Asymmetry & Finish Holding**: SVD has 14 trace steps and Content-Based has 12 steps. Content-Based holds its final completed view after finishing while SVD continues to its final tick.
+- **Pure Functional Panels**: Both visualizer panels are strictly pure functions of the store `tick`. No local timers or `useEffect`-driven animation state; seeking backward or forward renders correctly and deterministically.
