@@ -20,7 +20,7 @@ export const RankListView: React.FC<RankListViewProps> = ({
       <div className="flex items-center justify-between border-b border-neutral-800 pb-2">
         <div className="flex items-center gap-2">
           <span className="text-white font-bold font-sans text-sm">
-            Top-5 Content Recommendations
+            Top-{Math.min(5, recommendations.length)} Content Recommendations
           </span>
           <span className="text-[10px] text-muted bg-neutral-900 px-2 py-0.5 rounded border border-neutral-800 font-mono">
             Cosine Similarity Ranking

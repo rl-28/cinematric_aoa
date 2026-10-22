@@ -9,6 +9,8 @@
  */
 
 import { create } from "zustand";
+import { MOVIES } from "../data/movies";
+import { USERS } from "../data/ratings";
 import { runContent } from "../engines/content";
 import { scaleBenchmark } from "../engines/metrics";
 import { runSvd } from "../engines/svd";
@@ -98,9 +100,9 @@ export const useSimStore = create<SimState>((set, get) => ({
   benchmark: {
     status: "idle",
     result: {
-      n: 14,
-      numUsers: 10,
-      numMovies: 14,
+      n: MOVIES.length,
+      numUsers: USERS.length,
+      numMovies: MOVIES.length,
       svdMs: initialRuns.svd.stats.execMs,
       contentMs: initialRuns.content.stats.execMs,
       svdMemoryBytes: initialRuns.svd.stats.memoryBytes,
@@ -108,9 +110,9 @@ export const useSimStore = create<SimState>((set, get) => ({
     },
     cache: {
       demo: {
-        n: 14,
-        numUsers: 10,
-        numMovies: 14,
+        n: MOVIES.length,
+        numUsers: USERS.length,
+        numMovies: MOVIES.length,
         svdMs: initialRuns.svd.stats.execMs,
         contentMs: initialRuns.content.stats.execMs,
         svdMemoryBytes: initialRuns.svd.stats.memoryBytes,

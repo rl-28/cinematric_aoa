@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useSimStore, PlaybackSpeed, DatasetScale } from "@/lib/sim/store";
 import { totalTicks, progress } from "@/lib/sim/selectors";
+import { COLD_MOVIE, COLD_MOVIE_ID } from "@/lib/data/movies";
 
 export const ControlBar: React.FC = () => {
   const store = useSimStore();
@@ -50,8 +51,10 @@ export const ControlBar: React.FC = () => {
   }, [store]);
 
   const speeds: PlaybackSpeed[] = [0.5, 1, 2, 4];
+  const demoUsers = store.benchmark.cache["demo"]?.numUsers ?? 10;
+  const demoMovies = store.benchmark.cache["demo"]?.numMovies ?? 14;
   const scales: { id: DatasetScale; label: string; sub: string }[] = [
-    { id: "demo", label: "Demo", sub: "10×14" },
+    { id: "demo", label: "Demo", sub: `${demoUsers}×${demoMovies}` },
     { id: "100", label: "100", sub: "100×60" },
     { id: "500x300", label: "500×300", sub: "~2.5s" },
   ];
@@ -206,8 +209,8 @@ export const ControlBar: React.FC = () => {
             </button>
             <span className="text-[9px] text-neutral-500 pl-1 pt-0.5 max-w-[200px] truncate">
               {store.coldStart
-                ? "Chronopolis (m14) injected to test cold-start"
-                : "Standard catalog only; m14 excluded"}
+                ? `${COLD_MOVIE?.title ?? "Chronopolis"} (${COLD_MOVIE_ID}) injected to test cold-start`
+                : `Standard catalog only; ${COLD_MOVIE_ID} excluded`}
             </span>
           </div>
 

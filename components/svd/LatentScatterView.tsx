@@ -3,6 +3,7 @@
 import React from "react";
 import { MOVIES } from "@/lib/data/movies";
 import { USERS, TARGET_USER_ID } from "@/lib/data/ratings";
+import { useSimStore } from "@/lib/sim/store";
 
 interface LatentScatterViewProps {
   P: number[][]; // 10 x 2
@@ -15,6 +16,7 @@ export const LatentScatterView: React.FC<LatentScatterViewProps> = ({
   Q,
   sk,
 }) => {
+  const store = useSimStore();
   // SVG coordinates setup
   const width = 480;
   const height = 320;
@@ -46,7 +48,7 @@ export const LatentScatterView: React.FC<LatentScatterViewProps> = ({
   const originY = toSvgY(0);
 
   const catalogMovies = MOVIES.filter((m) => !m.cold);
-  const coldMovie = MOVIES.find((m) => m.cold);
+  const coldMovie = store.coldStart ? MOVIES.find((m) => m.cold) : null;
 
   return (
     <div className="flex flex-col gap-3 p-4 bg-surface rounded-md border border-neutral-800 text-xs font-mono">
@@ -119,27 +121,31 @@ export const LatentScatterView: React.FC<LatentScatterViewProps> = ({
             Factor 2
           </text>
 
-          {/* Origin / Cold Start Movie (Chronopolis m14) */}
-          <circle cx={originX} cy={originY} r="5" fill="#F59E0B" opacity="0.9" />
-          <circle
-            cx={originX}
-            cy={originY}
-            r="10"
-            fill="none"
-            stroke="#F59E0B"
-            strokeWidth="1.5"
-            strokeDasharray="2 2"
-          />
-          <text
-            x={originX + 12}
-            y={originY + 3}
-            fill="#FBBF24"
-            fontSize="9"
-            fontWeight="bold"
-            fontFamily="monospace"
-          >
-            {coldMovie?.title ?? "Cold Item"} (Q=[0,0])
-          </text>
+          {/* Origin / Cold Start Movie (Chronopolis m14 when cold-start is ON) */}
+          {coldMovie && (
+            <>
+              <circle cx={originX} cy={originY} r="5" fill="#F59E0B" opacity="0.9" />
+              <circle
+                cx={originX}
+                cy={originY}
+                r="10"
+                fill="none"
+                stroke="#F59E0B"
+                strokeWidth="1.5"
+                strokeDasharray="2 2"
+              />
+              <text
+                x={originX + 12}
+                y={originY + 3}
+                fill="#FBBF24"
+                fontSize="9"
+                fontWeight="bold"
+                fontFamily="monospace"
+              >
+                {coldMovie.title} (Q=[0,0])
+              </text>
+            </>
+          )}
 
           {/* Catalog Movies Q_i (diamonds/squares) */}
           {catalogMovies.map((movie, idx) => {
@@ -223,9 +229,11 @@ export const LatentScatterView: React.FC<LatentScatterViewProps> = ({
 
       <div className="flex justify-between text-[11px] text-muted font-sans pt-1">
         <span>* Users and items in Cluster 1 gravitate to top/right quadrant.</span>
-        <span className="text-amber-400 font-medium">
-          Cold items have zero ratings → Q vector is exactly [0, 0] at origin.
-        </span>
+        {store.coldStart && (
+          <span className="text-amber-400 font-medium">
+            Cold items have zero ratings → Q vector is exactly [0, 0] at origin.
+          </span>
+        )}
       </div>
     </div>
   );

@@ -144,3 +144,6 @@ export const MOVIES: Movie[] = [
     cold: true,
   },
 ];
+
+export const COLD_MOVIE = MOVIES.find((m) => m.cold) ?? MOVIES[MOVIES.length - 1];
+export const COLD_MOVIE_ID = COLD_MOVIE.id;

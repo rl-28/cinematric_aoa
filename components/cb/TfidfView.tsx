@@ -3,6 +3,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { useSimStore } from "@/lib/sim/store";
+import { MOVIES, COLD_MOVIE } from "@/lib/data/movies";
 
 interface TfidfViewProps {
   vocabulary?: string[];
@@ -12,12 +13,36 @@ export const TfidfView: React.FC<TfidfViewProps> = ({ vocabulary = [] }) => {
   const store = useSimStore();
   const tfidfMatrix = store.cbResult?.tfidfMatrix ?? [];
 
-  // Movie m1 (Inception) is index 0; m14 (Chronopolis) is index 13
+  const catalogFirst = MOVIES.find((m) => !m.cold) ?? MOVIES[0];
+  const catalogFirstIdx = MOVIES.findIndex((m) => m.id === catalogFirst.id);
+  const catalogSecond = MOVIES.filter((m) => !m.cold)[1] ?? MOVIES[1];
+  const catalogSecondIdx = MOVIES.findIndex((m) => m.id === catalogSecond.id);
+  const coldIdx = COLD_MOVIE ? MOVIES.findIndex((m) => m.id === COLD_MOVIE.id) : -1;
+
   const featured = [
-    { id: "m1", title: "Inception", idx: 0, isCold: false },
-    ...(store.coldStart
-      ? [{ id: "m14", title: "Chronopolis", idx: 13, isCold: true }]
-      : [{ id: "m2", title: "Interstellar", idx: 1, isCold: false }]),
+    {
+      id: catalogFirst.id,
+      title: catalogFirst.title,
+      idx: Math.max(0, catalogFirstIdx),
+      isCold: false,
+    },
+    ...(store.coldStart && COLD_MOVIE && coldIdx >= 0
+      ? [
+          {
+            id: COLD_MOVIE.id,
+            title: COLD_MOVIE.title,
+            idx: coldIdx,
+            isCold: true,
+          },
+        ]
+      : [
+          {
+            id: catalogSecond.id,
+            title: catalogSecond.title,
+            idx: Math.max(0, catalogSecondIdx),
+            isCold: false,
+          },
+        ]),
   ];
 
   const getTopTokensForMovie = (rowIdx: number) => {

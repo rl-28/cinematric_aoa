@@ -80,9 +80,14 @@ export const VectorGraph: React.FC = () => {
   const activeCandidateId =
     currentStep?.kind === "compare" ? currentStep.payload.candidateId : null;
 
-  // Liked movies for profile step (Alex Chen rated >= 4: m1, m2, m3, m5)
+  // Liked movies for profile step (Alex Chen rated >= 4)
   const isProfileActive = kind === "profile";
-  const likedMovieIds = new Set(["m1", "m2", "m3", "m5"]);
+  const profileStep = store.cbSteps.find((s) => s.kind === "profile");
+  const likedMovieIds = new Set(
+    profileStep && profileStep.kind === "profile"
+      ? profileStep.payload.ratedMovieIds
+      : ["m1", "m2", "m3", "m5"]
+  );
 
   // Top-5 movie IDs for rank step
   const isRankActive = kind === "rank";
@@ -168,7 +173,7 @@ export const VectorGraph: React.FC = () => {
           <TfidfView vocabulary={currentStep.payload.vocabulary} />
         )}
 
-        {kind === "profile" && (
+        {kind === "profile" && currentStep && currentStep.kind === "profile" && (
           <div className="p-3 rounded bg-surface border border-neutral-800 flex flex-col gap-2 text-xs font-sans">
             <div className="flex items-center justify-between">
               <span className="text-white font-semibold text-xs">
@@ -179,12 +184,21 @@ export const VectorGraph: React.FC = () => {
               </span>
             </div>
             <p className="text-neutral-300 text-[11px] leading-relaxed">
-              Synthesized from 4 rated movies:{" "}
-              <strong className="text-emerald-400">Inception (5★)</strong>,{" "}
-              <strong className="text-emerald-400">The Matrix (5★)</strong>,{" "}
-              <strong className="text-emerald-400">Interstellar (5★)</strong>, and{" "}
-              <strong className="text-blue-400">The Dark Knight (4★)</strong>.
-              Weighted vectors converge into Alex&apos;s taste centroid shown on the map below.
+              Synthesized from {currentStep.payload.ratedMovieIds.length} rated movies:{" "}
+              {currentStep.payload.ratedMovieIds.map((id, idx) => {
+                const m = MOVIES.find((movie) => movie.id === id);
+                const weight = currentStep.payload.weights[idx];
+                const isLast = idx === currentStep.payload.ratedMovieIds.length - 1;
+                return (
+                  <React.Fragment key={id}>
+                    <strong className="text-emerald-400">
+                      {m ? m.title : id} ({weight}★)
+                    </strong>
+                    {!isLast ? (idx === currentStep.payload.ratedMovieIds.length - 2 ? ", and " : ", ") : "."}
+                  </React.Fragment>
+                );
+              })}
+              {" "}Weighted vectors converge into Alex&apos;s taste centroid shown on the map below.
             </p>
           </div>
         )}
@@ -192,7 +206,7 @@ export const VectorGraph: React.FC = () => {
         {kind === "compare" && currentStep && currentStep.kind === "compare" && (
           <CompareCard
             payload={currentStep.payload}
-            vocabDim={store.cbResult?.vocabulary.length ?? 112}
+            vocabDim={store.cbResult?.vocabulary.length ?? store.cbStats?.vocabSize ?? 112}
           />
         )}
 
@@ -213,7 +227,7 @@ export const VectorGraph: React.FC = () => {
                 2D PCA Semantic Projection
               </span>
               <span className="text-[10px] text-muted bg-neutral-900 px-1.5 py-0.5 rounded border border-neutral-800">
-                14 Movies + Target Centroid
+                {(store.coldStart ? MOVIES.length : MOVIES.filter((m) => !m.cold).length)} Movies + Target Centroid
               </span>
             </div>
             <div className="flex items-center gap-3 text-[10px] font-sans">
@@ -525,11 +539,13 @@ export const VectorGraph: React.FC = () => {
 
           <div className="flex justify-between text-[11px] text-muted font-sans px-1">
             <span>
-              * Points are 2D PCA projections of {store.cbResult?.vocabulary.length ?? 112}-dimensional L2-normalized TF-IDF vectors.
+              * Points are 2D PCA projections of {store.cbResult?.vocabulary.length ?? store.cbStats?.vocabSize ?? 112}-dimensional L2-normalized TF-IDF vectors.
             </span>
-            <span className="text-amber-400 font-medium">
-              Chronopolis (m14) is embedded directly from metadata.
-            </span>
+            {store.coldStart && (
+              <span className="text-amber-400 font-medium">
+                Chronopolis (m14) is embedded directly from metadata.
+              </span>
+            )}
           </div>
         </div>
       </div>

@@ -93,7 +93,7 @@ export const MetricsOverlay: React.FC = () => {
             Comparison Metrics & Benchmarks
           </span>
           <span className="text-[11px] font-mono text-muted hidden sm:inline">
-            Precision: <strong className="text-amber-400">Tie (0.40)</strong> · SVD vs Content-Based
+            Precision: <strong className="text-amber-400">Tie ({svdPrecision.toFixed(2)})</strong> · SVD vs Content-Based
           </span>
         </div>
 
@@ -148,7 +148,7 @@ export const MetricsOverlay: React.FC = () => {
                       {mounted ? svdRevealedMs.toFixed(2) : "0.00"} ms
                     </span>
                     <span className="text-[10px] text-muted block font-sans">
-                      this run (median: {mounted ? svdMedianMs.toFixed(2) : "0.65"} ms)
+                      this run (median: {svdMedianMs.toFixed(2)} ms)
                     </span>
                   </div>
                 </div>
@@ -164,7 +164,7 @@ export const MetricsOverlay: React.FC = () => {
                       {mounted ? cbRevealedMs.toFixed(2) : "0.00"} ms
                     </span>
                     <span className="text-[10px] text-muted block font-sans">
-                      this run (median: {mounted ? cbMedianMs.toFixed(2) : "3.94"} ms)
+                      this run (median: {cbMedianMs.toFixed(2)} ms)
                     </span>
                   </div>
                 </div>
@@ -230,16 +230,16 @@ export const MetricsOverlay: React.FC = () => {
               <div className="pt-2 mt-2 border-t border-neutral-800/80 flex items-center justify-between text-[10px]">
                 <span className="text-muted font-sans">Leaner footprint:</span>
                 <span className="font-semibold text-emerald-400 bg-emerald-950/40 px-1.5 py-0.5 rounded border border-emerald-800/50">
-                  {memoryWinner === "svd" ? "SVD (compact 10×14)" : "Content-Based"}
+                  {memoryWinner === "svd" ? `SVD (compact ${store.benchmark.cache["demo"]?.numUsers ?? 10}×${store.benchmark.cache["demo"]?.numMovies ?? 14})` : "Content-Based"}
                 </span>
               </div>
             </div>
 
-            {/* 3. Precision@5 (Defensible Tie 0.40 vs 0.40) */}
+            {/* 3. Precision@5 (Defensible Tie) */}
             <div className="p-3 rounded-lg border border-amber-800/40 bg-amber-950/10 flex flex-col justify-between">
               <div className="flex items-center justify-between pb-1.5 border-b border-amber-900/30">
                 <span className="text-[11px] font-bold uppercase tracking-wider text-amber-300">
-                  Precision@5 (Accuracy)
+                  Precision@{offlineMetrics.k} (Accuracy)
                 </span>
                 <span className="text-[9px] font-mono text-amber-400/80">held-out test split</span>
               </div>
@@ -252,7 +252,7 @@ export const MetricsOverlay: React.FC = () => {
                   </div>
                   <span className="text-white font-bold">
                     {svdPrecision.toFixed(2)}{" "}
-                    <span className="text-muted text-[10px] font-sans">(2/5 hits)</span>
+                    <span className="text-muted text-[10px] font-sans">({Math.round(offlineMetrics.k * svdPrecision)}/{offlineMetrics.k} hits)</span>
                   </span>
                 </div>
 
@@ -263,7 +263,7 @@ export const MetricsOverlay: React.FC = () => {
                   </div>
                   <span className="text-white font-bold">
                     {cbPrecision.toFixed(2)}{" "}
-                    <span className="text-muted text-[10px] font-sans">(2/5 hits)</span>
+                    <span className="text-muted text-[10px] font-sans">({Math.round(offlineMetrics.k * cbPrecision)}/{offlineMetrics.k} hits)</span>
                   </span>
                 </div>
 
@@ -275,7 +275,7 @@ export const MetricsOverlay: React.FC = () => {
               <div className="pt-2 mt-2 border-t border-amber-900/30 flex items-center justify-between text-[10px]">
                 <span className="text-muted font-sans">Evaluation result:</span>
                 <span className="font-bold text-amber-300 bg-amber-950/60 px-2 py-0.5 rounded border border-amber-700/60 uppercase tracking-wide">
-                  TIE (0.40 vs 0.40)
+                  TIE ({svdPrecision.toFixed(2)} vs {cbPrecision.toFixed(2)})
                 </span>
               </div>
             </div>
@@ -327,7 +327,7 @@ export const MetricsOverlay: React.FC = () => {
                     </span>
                   ) : (
                     <span className="text-neutral-400 text-[10px] font-sans">
-                      1.00 (embeds metadata)
+                      {cbColdScore.toFixed(2)} (embeds metadata)
                     </span>
                   )}
                 </div>
@@ -343,7 +343,7 @@ export const MetricsOverlay: React.FC = () => {
                 <span className="text-muted font-sans">Winner:</span>
                 {coldWinner === "cb" ? (
                   <span className="font-semibold text-emerald-400 bg-emerald-950/40 px-1.5 py-0.5 rounded border border-emerald-800/50">
-                    Content-Based (1.0 vs 0.0)
+                    Content-Based ({cbColdScore.toFixed(1)} vs {svdColdScore.toFixed(1)})
                   </span>
                 ) : (
                   <span className="text-neutral-500 text-[10px] font-sans">
@@ -364,7 +364,12 @@ export const MetricsOverlay: React.FC = () => {
                   Synthetic Dataset Scale Benchmark
                 </span>
                 <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-neutral-800 text-neutral-300 border border-neutral-700">
-                  Selected: {store.datasetScale === "500x300" ? "500 Users × 300 Movies" : store.datasetScale === "100" ? "100 Users × 60 Movies" : "10 Users × 14 Movies (Demo)"}
+                  Selected:{" "}
+                  {store.datasetScale === "500x300"
+                    ? `${benchResult && store.datasetScale === "500x300" ? benchResult.numUsers : 500} Users × ${benchResult && store.datasetScale === "500x300" ? benchResult.numMovies : 300} Movies`
+                    : store.datasetScale === "100"
+                    ? `${benchResult && store.datasetScale === "100" ? benchResult.numUsers : 100} Users × ${benchResult && store.datasetScale === "100" ? benchResult.numMovies : 60} Movies`
+                    : `${store.benchmark.cache["demo"]?.numUsers ?? 10} Users × ${store.benchmark.cache["demo"]?.numMovies ?? 14} Movies (Demo)`}
                 </span>
               </div>
               <span className="text-[10px] text-muted font-sans">

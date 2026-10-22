@@ -65,16 +65,16 @@ export const MatrixGrid: React.FC<MatrixGridProps> = ({
             </div>
           ))}
 
-          {/* Cold Column (m14) */}
+          {/* Cold Column */}
           {coldMovie && (
             <div
               className={`w-11 shrink-0 text-center py-1 border-l border-dashed border-neutral-700/80 bg-neutral-900/40 flex flex-col items-center justify-end ${
-                activeCell?.movieId === "m14" ? "text-accent font-bold" : "text-neutral-500"
+                activeCell?.movieId === coldMovie.id ? "text-accent font-bold" : "text-neutral-500"
               }`}
               title="Cold Start Item: 0 ratings in dataset"
             >
               <span className="text-[9px] text-amber-400 font-bold">COLD</span>
-              <span className="text-[8px] text-neutral-500 font-sans">m14</span>
+              <span className="text-[8px] text-neutral-500 font-sans">{coldMovie.id}</span>
             </div>
           )}
         </div>
@@ -198,24 +198,24 @@ export const MatrixGrid: React.FC<MatrixGridProps> = ({
                   );
                 })}
 
-                {/* Cold Column (m14) */}
+                {/* Cold Column */}
                 {coldMovie && (
                   <div
                     className={`w-11 h-7 shrink-0 border-l border-dashed border-neutral-700/80 flex items-center justify-center m-[1px] ${
-                      activeCell?.userIdx === rowIdx && activeCell?.movieId === "m14"
+                      activeCell?.userIdx === rowIdx && activeCell?.movieId === coldMovie.id
                         ? "bg-accent/25 text-accent ring-2 ring-accent font-bold"
-                        : isTarget && predictedMap?.has("m14")
+                        : isTarget && predictedMap?.has(coldMovie.id)
                         ? "bg-amber-950/25 text-amber-400 font-medium"
                         : "bg-neutral-950/60 text-neutral-600"
                     }`}
                     title={
-                      isTarget && predictedMap?.has("m14")
-                        ? `Chronopolis fallback prediction: ${predictedMap.get("m14")?.prediction.toFixed(1)}`
+                      isTarget && predictedMap?.has(coldMovie.id)
+                        ? `${coldMovie.title} fallback prediction: ${predictedMap.get(coldMovie.id)?.prediction.toFixed(1)}`
                         : "Cold start movie: 0 observed ratings"
                     }
                   >
-                    {isTarget && predictedMap?.has("m14")
-                      ? predictedMap.get("m14")?.prediction.toFixed(1)
+                    {isTarget && predictedMap?.has(coldMovie.id)
+                      ? predictedMap.get(coldMovie.id)?.prediction.toFixed(1)
                       : "∅"}
                   </div>
                 )}

@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { MOVIES } from "@/lib/data/movies";
+import { MOVIES, COLD_MOVIE } from "@/lib/data/movies";
 import { useSimStore } from "@/lib/sim/store";
 
 interface TokenizeViewProps {
@@ -11,16 +11,45 @@ interface TokenizeViewProps {
 
 export const TokenizeView: React.FC<TokenizeViewProps> = ({
   tokensByMovie = {},
-  vocabSize = 112,
+  vocabSize,
 }) => {
-  const coldStart = useSimStore((s) => s.coldStart);
+  const store = useSimStore();
+  const coldStart = store.coldStart;
+
+  const effectiveVocabSize =
+    vocabSize ??
+    store.cbResult?.vocabulary?.length ??
+    store.cbStats?.vocabSize ??
+    Object.keys(tokensByMovie).length;
+
+  const catalogFirst = MOVIES.find((m) => !m.cold) ?? MOVIES[0];
+  const catalogSecond = MOVIES.filter((m) => !m.cold)[1] ?? MOVIES[1];
 
   // Feature two representative movies
   const featuredMovies = [
-    { id: "m1", title: "Inception", isCold: false, desc: "Catalog Movie (Rated 5★ by Alex)" },
-    ...(coldStart
-      ? [{ id: "m14", title: "Chronopolis", isCold: true, desc: "Cold-Start Item (0 ratings in dataset)" }]
-      : [{ id: "m2", title: "Interstellar", isCold: false, desc: "Catalog Movie (Sci-Fi, rated 5★)" }]),
+    {
+      id: catalogFirst.id,
+      title: catalogFirst.title,
+      isCold: false,
+      desc: "Catalog Movie (Rated 5★ by Alex)",
+    },
+    ...(coldStart && COLD_MOVIE
+      ? [
+          {
+            id: COLD_MOVIE.id,
+            title: COLD_MOVIE.title,
+            isCold: true,
+            desc: "Cold-Start Item (0 ratings in dataset)",
+          },
+        ]
+      : [
+          {
+            id: catalogSecond.id,
+            title: catalogSecond.title,
+            isCold: false,
+            desc: "Catalog Movie (Sci-Fi, rated 5★)",
+          },
+        ]),
   ];
 
   const getNamespaceStyle = (token: string) => {
@@ -45,7 +74,7 @@ export const TokenizeView: React.FC<TokenizeViewProps> = ({
             Namespaced Feature Tokenization
           </span>
           <span className="text-[10px] text-accent bg-accent/10 px-2 py-0.5 rounded border border-accent/30 font-bold">
-            {vocabSize} Unique Terms in Vocab
+            {effectiveVocabSize} Unique Terms in Vocab
           </span>
         </div>
         <div className="flex items-center gap-2 text-[10px] font-sans">

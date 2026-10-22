@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useSimStore } from "@/lib/sim/store";
 import { useReplay } from "@/lib/sim/useReplay";
+import { TARGET_USER } from "@/lib/data/ratings";
 import { MatrixPipeline } from "@/components/svd/MatrixPipeline";
 import { VectorGraph } from "@/components/cb/VectorGraph";
 import { ControlBar } from "@/components/ui/ControlBar";
@@ -46,7 +47,9 @@ export default function SimulatePage() {
         <div className="flex items-center gap-3 text-xs">
           <div className="flex items-center gap-2 bg-neutral-900 px-2.5 py-1 rounded border border-neutral-800">
             <span className="text-muted text-[11px] font-sans">Target User:</span>
-            <span className="text-white font-mono font-semibold">Alex Chen</span>
+            <span className="text-white font-mono font-semibold">
+              {TARGET_USER.name.replace(" (Target)", "")}
+            </span>
             <span className="text-[10px] text-accent bg-accent/10 px-1.5 py-0.5 rounded border border-accent/30 font-medium">
               Target
             </span>

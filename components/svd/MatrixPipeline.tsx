@@ -111,7 +111,7 @@ export const MatrixPipeline: React.FC = () => {
             {kind === "load" && (
               <div className="flex flex-col gap-3">
                 <div className="p-2.5 rounded bg-surface border border-neutral-800 text-[11px] text-muted font-sans">
-                  Observed ratings matrix (10 users × 13 movies). Target user{" "}
+                  Observed ratings matrix ({rawMatrix.length} users × {rawMatrix[0]?.length ?? 13} catalog movies). Target user{" "}
                   <strong className="text-accent font-mono">Alex Chen</strong> is outlined in red.
                   {store.coldStart && (
                     <>

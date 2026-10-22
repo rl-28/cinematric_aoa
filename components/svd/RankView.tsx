@@ -20,7 +20,7 @@ export const RankView: React.FC<RankViewProps> = ({
       <div className="flex items-center justify-between border-b border-neutral-800 pb-2">
         <div className="flex items-center gap-2">
           <span className="text-white font-bold font-sans text-sm">
-            Top-5 SVD Recommendations
+            Top-{Math.min(5, recommendations.length)} SVD Recommendations
           </span>
           <span className="text-[10px] text-muted bg-neutral-900 px-2 py-0.5 rounded border border-neutral-800 font-mono">
             Target User: Alex Chen
@@ -95,7 +95,7 @@ export const RankView: React.FC<RankViewProps> = ({
                 </div>
                 <p className="text-neutral-300 text-[11px] mt-1.5 leading-relaxed">
                   This item has zero ratings in the user-item matrix. Consequently, its latent factor vector Q is [0, 0].
-                  The algorithm reverted to baseline prediction only (μ + b_u) and excluded it from the top-5 recommendations list.
+                  The algorithm reverted to baseline prediction only (μ + b_u) and excluded it from the top-{Math.min(5, recommendations.length)} recommendations list.
                 </p>
                 <p className="text-neutral-400 text-[10px] mt-1">
                   Engine note: {item.reason}

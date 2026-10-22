@@ -9,6 +9,7 @@ import {
   SvdUnrankableItem,
   SvdStep,
 } from "../engines/types";
+import { COLD_MOVIE_ID } from "../data/movies";
 import { SimState } from "./store";
 
 /**
@@ -24,7 +25,7 @@ export function visibleSvdSteps(state: SimState): SvdStep[] {
 
   const result: SvdStep[] = [];
   for (const s of state.svdSteps) {
-    if (s.kind === "dot_product" && s.payload.movieId === "m14") {
+    if (s.kind === "dot_product" && s.payload.movieId === COLD_MOVIE_ID) {
       continue;
     }
     if (s.kind === "rank") {
@@ -33,10 +34,10 @@ export function visibleSvdSteps(state: SimState): SvdStep[] {
         payload: {
           ...s.payload,
           recommendations: s.payload.recommendations.filter(
-            (r) => r.movieId !== "m14"
+            (r) => r.movieId !== COLD_MOVIE_ID
           ),
           unrankable: s.payload.unrankable
-            ? s.payload.unrankable.filter((u) => u.itemId !== "m14")
+            ? s.payload.unrankable.filter((u) => u.itemId !== COLD_MOVIE_ID)
             : [],
         },
       });
@@ -60,7 +61,7 @@ export function visibleCbSteps(state: SimState): ContentStep[] {
 
   const result: ContentStep[] = [];
   for (const s of state.cbSteps) {
-    if (s.kind === "compare" && s.payload.candidateId === "m14") {
+    if (s.kind === "compare" && s.payload.candidateId === COLD_MOVIE_ID) {
       continue;
     }
     if (s.kind === "rank") {
@@ -69,7 +70,7 @@ export function visibleCbSteps(state: SimState): ContentStep[] {
         payload: {
           ...s.payload,
           recommendations: s.payload.recommendations.filter(
-            (r) => r.movieId !== "m14" && !r.isCold
+            (r) => r.movieId !== COLD_MOVIE_ID && !r.isCold
           ),
         },
       });
@@ -264,7 +265,7 @@ export function latentFactorsAtTick(
  * (e.g. cold-start movie Chronopolis m14 when cold-start mode is active).
  */
 export function isItemHighlighted(state: SimState, movieId: string): boolean {
-  return Boolean(state.coldStart && movieId === "m14");
+  return Boolean(state.coldStart && movieId === COLD_MOVIE_ID);
 }
 
 /**

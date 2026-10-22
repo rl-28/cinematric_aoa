@@ -30,11 +30,11 @@ export const DecompositionView: React.FC<DecompositionViewProps> = ({
         <div className="flex items-center gap-2">
           <span className="text-muted font-sans text-xs uppercase tracking-wider">Decomposition</span>
           <span className="text-white font-semibold font-mono text-sm">
-            A<sub className="text-[10px] text-muted">10×13</sub> ≈ U<sub className="text-[10px] text-muted">{rowsU}×{colsU}</sub> · Σ<sub className="text-[10px] text-muted">{lenS}×{lenS}</sub> · V<sup className="text-[10px] text-muted">T</sup><sub className="text-[10px] text-muted">{rowsV}×{colsV}</sub>
+            A<sub className="text-[10px] text-muted">{rowsU}×{rowsV}</sub> ≈ U<sub className="text-[10px] text-muted">{rowsU}×{colsU}</sub> · Σ<sub className="text-[10px] text-muted">{lenS}×{lenS}</sub> · V<sup className="text-[10px] text-muted">T</sup><sub className="text-[10px] text-muted">{rowsV}×{colsV}</sub>
           </span>
         </div>
         <div className="text-muted text-[11px] font-sans">
-          Rank {truncateK ? `k = ${truncateK} Truncated` : "Full Rank 13"}
+          Rank {truncateK ? `k = ${truncateK} Truncated` : `Full Rank ${lenS}`}
         </div>
       </div>
 
@@ -54,11 +54,11 @@ export const DecompositionView: React.FC<DecompositionViewProps> = ({
               <span>k={colsU}</span>
             </div>
             <div className="text-center text-[10px] font-bold text-white">
-              10 × {colsU}
+              {rowsU} × {colsU}
             </div>
             <div className="flex justify-between text-[9px] text-neutral-500">
-              <span>u₁₀</span>
-              <span className="text-accent">{truncateK ? "k=2 kept" : ""}</span>
+              <span>u_{rowsU}</span>
+              <span className="text-accent">{truncateK ? `k=${truncateK} kept` : ""}</span>
             </div>
           </div>
         </div>
@@ -101,13 +101,13 @@ export const DecompositionView: React.FC<DecompositionViewProps> = ({
           >
             <div className="flex justify-between text-[9px] text-neutral-400">
               <span>v₁</span>
-              <span>m₁₃</span>
+              <span>m_{colsV}</span>
             </div>
             <div className="text-center text-[10px] font-bold text-white">
               {rowsV} × {colsV}
             </div>
             <div className="flex justify-between text-[9px] text-neutral-500">
-              <span className="text-blue-400">{truncateK ? "k=2 kept" : ""}</span>
+              <span className="text-blue-400">{truncateK ? `k=${truncateK} kept` : ""}</span>
               <span>m₁</span>
             </div>
           </div>

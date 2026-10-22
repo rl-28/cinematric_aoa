@@ -3,6 +3,8 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { ContentComparePayload } from "@/lib/engines/types";
+import { useSimStore } from "@/lib/sim/store";
+import { MOVIES } from "@/lib/data/movies";
 
 interface CompareCardProps {
   payload: ContentComparePayload;
@@ -11,8 +13,15 @@ interface CompareCardProps {
 
 export const CompareCard: React.FC<CompareCardProps> = ({
   payload,
-  vocabDim = 112,
+  vocabDim,
 }) => {
+  const store = useSimStore();
+  const effectiveVocabDim =
+    vocabDim ??
+    store.cbResult?.vocabulary?.length ??
+    store.cbStats?.vocabSize ??
+    112;
+
   const {
     candidateId,
     title,
@@ -23,6 +32,8 @@ export const CompareCard: React.FC<CompareCardProps> = ({
     angleDeg,
     isCold,
   } = payload;
+
+  const candidateMovie = MOVIES.find((m) => m.id === candidateId);
 
   return (
     <div className="flex flex-col gap-3 p-3.5 bg-surface rounded-md border border-neutral-800 text-xs font-mono">
@@ -102,7 +113,7 @@ export const CompareCard: React.FC<CompareCardProps> = ({
       <div className="p-2.5 rounded bg-neutral-900/40 border border-neutral-800 text-[11px] font-sans text-neutral-400 flex items-start gap-2">
         <span className="text-blue-400 text-sm">📐</span>
         <p className="leading-relaxed">
-          <strong className="text-neutral-200">Honesty Note:</strong> The angle shown (<span className="text-amber-300 font-mono">{angleDeg.toFixed(1)}°</span>) is the mathematically authentic angle in full {vocabDim}-dimensional token space. The 2D map below is a PCA projection, so the visual arc is drawn schematically — trust the payload number as the real value.
+          <strong className="text-neutral-200">Honesty Note:</strong> The angle shown (<span className="text-amber-300 font-mono">{angleDeg.toFixed(1)}°</span>) is the mathematically authentic angle in full {effectiveVocabDim}-dimensional token space. The 2D map below is a PCA projection, so the visual arc is drawn schematically — trust the payload number as the real value.
         </p>
       </div>
 
@@ -110,7 +121,7 @@ export const CompareCard: React.FC<CompareCardProps> = ({
         <div className="p-2.5 rounded bg-emerald-950/20 border border-emerald-800/40 text-[11px] font-sans text-emerald-300/90 flex items-start gap-2">
           <span>✨</span>
           <p className="leading-relaxed">
-            <strong>Cold-Start Resilience:</strong> Unlike SVD (which had zero latent factors and fell back to baseline), Content-Based recommendations score Chronopolis normally based on director (<span className="font-mono text-white">Alex Garland</span>), cast, and Sci-Fi tags!
+            <strong>Cold-Start Resilience:</strong> Unlike SVD (which had zero latent factors and fell back to baseline), Content-Based recommendations score {title} normally based on director (<span className="font-mono text-white">{candidateMovie?.director ?? "Christopher Nolan"}</span>), cast, and {candidateMovie?.genres[0] ?? "Sci-Fi"} tags!
           </p>
         </div>
       )}
