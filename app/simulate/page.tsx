@@ -41,6 +41,12 @@ export default function SimulatePage() {
           <span className="hidden md:inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono bg-neutral-900 text-neutral-400 border border-neutral-800">
             SVD vs. Content-Based Simulation
           </span>
+          <Link
+            href="/"
+            className="text-xs text-muted hover:text-white transition-colors ml-1 font-sans"
+          >
+            Back to home
+          </Link>
         </div>
 
         {/* Target User Info & Dataset Context */}

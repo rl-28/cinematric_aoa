@@ -144,10 +144,10 @@ export const MetricsOverlay: React.FC = () => {
                     <span className="text-neutral-300">SVD:</span>
                   </div>
                   <div className="text-right">
-                    <span className="text-white font-bold">
+                    <span className="text-white font-bold" suppressHydrationWarning>
                       {mounted ? svdRevealedMs.toFixed(2) : "0.00"} ms
                     </span>
-                    <span className="text-[10px] text-muted block font-sans">
+                    <span className="text-[10px] text-muted block font-sans" suppressHydrationWarning>
                       this run (median: {svdMedianMs.toFixed(2)} ms)
                     </span>
                   </div>
@@ -160,10 +160,10 @@ export const MetricsOverlay: React.FC = () => {
                     <span className="text-neutral-300">Content:</span>
                   </div>
                   <div className="text-right">
-                    <span className="text-white font-bold">
+                    <span className="text-white font-bold" suppressHydrationWarning>
                       {mounted ? cbRevealedMs.toFixed(2) : "0.00"} ms
                     </span>
-                    <span className="text-[10px] text-muted block font-sans">
+                    <span className="text-[10px] text-muted block font-sans" suppressHydrationWarning>
                       this run (median: {cbMedianMs.toFixed(2)} ms)
                     </span>
                   </div>
@@ -373,7 +373,9 @@ export const MetricsOverlay: React.FC = () => {
                 </span>
               </div>
               <span className="text-[10px] text-muted font-sans">
-                Notice: Content-Based scales linearly $O(N \cdot d)$, outperforming SVD cubic decomposition $O(N \cdot M^2)$ at scale.
+                {benchResult
+                  ? `In this synthetic benchmark (${benchResult.numUsers} users × ${benchResult.numMovies} movies), Content-Based completed in ${benchResult.contentMs.toFixed(1)} ms vs. SVD in ${benchResult.svdMs.toFixed(1)} ms.`
+                  : "In this synthetic benchmark, execution times are measured across the selected scale."}
               </span>
             </div>
 

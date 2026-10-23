@@ -56,17 +56,12 @@ function LandingPageContent() {
             >
               Disclosures
             </a>
-            <a
+            <Link
               href="/simulate"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 sm:gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg bg-accent hover:bg-red-600 text-white font-bold text-xs sm:text-sm tracking-wide shadow-[0_0_20px_rgba(229,9,20,0.35)] hover:shadow-[0_0_30px_rgba(229,9,20,0.6)] transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-white focus-visible:outline-none shrink-0"
+              className="inline-flex items-center justify-center px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg bg-accent hover:bg-red-600 text-white font-bold text-xs sm:text-sm tracking-wide shadow-[0_0_20px_rgba(229,9,20,0.35)] hover:shadow-[0_0_30px_rgba(229,9,20,0.6)] transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-white focus-visible:outline-none shrink-0"
             >
               <span>Launch<span className="hidden xs:inline sm:inline"> Simulator</span></span>
-              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-              </svg>
-            </a>
+            </Link>
           </div>
         </div>
       </header>
@@ -97,17 +92,12 @@ function LandingPageContent() {
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-14">
-              <a
+              <Link
                 href="/simulate"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-xl bg-accent hover:bg-red-600 text-white font-extrabold text-base tracking-wide shadow-[0_0_35px_rgba(229,9,20,0.5)] hover:shadow-[0_0_50px_rgba(229,9,20,0.75)] transition-all duration-300 transform hover:scale-[1.03] active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-white focus-visible:outline-none"
+                className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 rounded-xl bg-accent hover:bg-red-600 text-white font-extrabold text-base tracking-wide shadow-[0_0_35px_rgba(229,9,20,0.5)] hover:shadow-[0_0_50px_rgba(229,9,20,0.75)] transition-all duration-300 transform hover:scale-[1.03] active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-white focus-visible:outline-none"
               >
                 <span>Launch Simulator</span>
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                </svg>
-              </a>
+              </Link>
 
               <a
                 href="#algorithms"
@@ -163,7 +153,7 @@ function LandingPageContent() {
                 </div>
                 <h3 className="text-base font-bold text-white mb-2">Runs in the Browser</h3>
                 <p className="text-xs text-neutral-400 leading-relaxed">
-                  Real linear algebra (`ml-matrix` Truncated SVD) and TF-IDF vector math execute client-side on actual typed matrices.
+                  Real linear algebra (<code className="text-neutral-200 font-mono text-[11px] bg-neutral-900 px-1 py-0.5 rounded border border-neutral-800">ml-matrix</code> Truncated SVD) and TF-IDF vector math execute client-side on actual typed matrices.
                 </p>
               </div>
 
@@ -341,17 +331,12 @@ function LandingPageContent() {
             <p className="text-neutral-400 text-sm sm:text-base max-w-xl mx-auto mb-8">
               Open the interactive dual-panel dashboard to scrub through every algebraic step, toggle cold-start items, and inspect real-time residual matrices.
             </p>
-            <a
+            <Link
               href="/simulate"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-xl bg-accent hover:bg-red-600 text-white font-bold text-base tracking-wide shadow-[0_0_35px_rgba(229,9,20,0.5)] hover:shadow-[0_0_50px_rgba(229,9,20,0.7)] transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-white focus-visible:outline-none"
+              className="inline-flex items-center justify-center px-8 py-4 rounded-xl bg-accent hover:bg-red-600 text-white font-bold text-base tracking-wide shadow-[0_0_35px_rgba(229,9,20,0.5)] hover:shadow-[0_0_50px_rgba(229,9,20,0.7)] transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-white focus-visible:outline-none"
             >
               <span>Launch Simulator</span>
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-              </svg>
-            </a>
+            </Link>
           </div>
         </section>
       </main>
@@ -372,14 +357,12 @@ function LandingPageContent() {
             </div>
 
             <div className="flex items-center gap-6 text-xs text-muted">
-              <a
+              <Link
                 href="/simulate"
-                target="_blank"
-                rel="noopener noreferrer"
                 className="hover:text-white transition"
               >
-                Simulator ↗
-              </a>
+                Simulator
+              </Link>
               <a
                 href="https://github.com/rl-28/cinematric_aoa"
                 target="_blank"

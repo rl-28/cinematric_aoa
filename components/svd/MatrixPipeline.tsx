@@ -68,7 +68,7 @@ export const MatrixPipeline: React.FC = () => {
           {/* Revealed Compute Time Readout */}
           <div className="flex items-center gap-1.5 bg-neutral-900 px-2.5 py-1 rounded border border-neutral-800 font-mono text-xs">
             <span className="text-muted text-[10px] font-sans">Time:</span>
-            <span className="text-accent font-bold">{execMs.toFixed(2)}</span>
+            <span className="text-accent font-bold" suppressHydrationWarning>{execMs.toFixed(2)}</span>
             <span className="text-muted text-[10px]">ms</span>
           </div>
         </div>
