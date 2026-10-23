@@ -24,29 +24,30 @@ export const DecompositionView: React.FC<DecompositionViewProps> = ({
   const colsV = V[0]?.length ?? 13; // 13
 
   return (
-    <div className="flex flex-col gap-3 p-3 bg-surface rounded border border-neutral-800 text-xs font-sans">
+    <div className="flex flex-col gap-5 p-4 bg-surface rounded-md border border-neutral-800 text-xs font-mono">
       {/* Mathematical Identity Equation Header */}
-      <div className="flex items-center justify-between border-b border-neutral-800/80 pb-2">
+      <div className="flex items-center justify-between border-b border-neutral-800/80 pb-3">
         <div className="flex items-center gap-2">
+          <span className="text-muted font-sans text-xs uppercase tracking-wider">Decomposition</span>
           <span className="text-white font-semibold font-mono text-sm">
             A<sub className="text-[10px] text-muted">{rowsU}×{rowsV}</sub> ≈ U<sub className="text-[10px] text-muted">{rowsU}×{colsU}</sub> · Σ<sub className="text-[10px] text-muted">{lenS}×{lenS}</sub> · V<sup className="text-[10px] text-muted">T</sup><sub className="text-[10px] text-muted">{rowsV}×{colsV}</sub>
           </span>
         </div>
-        <div className="text-muted text-[10px] font-mono">
+        <div className="text-muted text-[11px] font-sans">
           Rank {truncateK ? `k = ${truncateK} Truncated` : `Full Rank ${lenS}`}
         </div>
       </div>
 
       {/* Block Shape Diagram */}
-      <div className="flex items-center justify-center gap-3 py-1 font-mono">
+      <div className="flex items-center justify-center gap-3 py-2 overflow-x-auto">
         {/* Matrix U */}
-        <div className="flex flex-col items-center gap-1">
-          <div className="text-[10px] text-muted font-sans font-medium">U (User Basis)</div>
+        <div className="flex flex-col items-center gap-1.5">
+          <div className="text-[10px] text-muted font-semibold">U (User Basis)</div>
           <div
             className={`relative rounded border transition-colors flex flex-col justify-between p-1.5 ${
               truncateK ? "border-accent/80 bg-accent/10" : "border-neutral-700 bg-neutral-900/60"
             }`}
-            style={{ width: "84px", height: "105px" }}
+            style={{ width: "90px", height: "130px" }}
           >
             <div className="flex justify-between text-[9px] text-neutral-400">
               <span>u₁</span>
@@ -57,21 +58,21 @@ export const DecompositionView: React.FC<DecompositionViewProps> = ({
             </div>
             <div className="flex justify-between text-[9px] text-neutral-500">
               <span>u_{rowsU}</span>
-              <span className="text-accent">{truncateK ? `k=${truncateK}` : ""}</span>
+              <span className="text-accent">{truncateK ? `k=${truncateK} kept` : ""}</span>
             </div>
           </div>
         </div>
 
-        <div className="text-neutral-500 text-base font-bold">×</div>
+        <div className="text-neutral-500 text-lg font-bold">×</div>
 
         {/* Matrix Σ */}
-        <div className="flex flex-col items-center gap-1">
-          <div className="text-[10px] text-muted font-sans font-medium">Σ (Singular Values)</div>
+        <div className="flex flex-col items-center gap-1.5">
+          <div className="text-[10px] text-muted font-semibold">Σ (Singular Values)</div>
           <div
             className={`relative rounded border transition-colors flex flex-col justify-between p-1.5 ${
               truncateK ? "border-amber-500/80 bg-amber-950/20" : "border-neutral-700 bg-neutral-900/60"
             }`}
-            style={{ width: "95px", height: "95px" }}
+            style={{ width: "110px", height: "110px" }}
           >
             <div className="flex justify-between text-[9px] text-neutral-400">
               <span className="text-amber-400 font-bold">σ₁={s[0]?.toFixed(1)}</span>
@@ -87,16 +88,16 @@ export const DecompositionView: React.FC<DecompositionViewProps> = ({
           </div>
         </div>
 
-        <div className="text-neutral-500 text-base font-bold">×</div>
+        <div className="text-neutral-500 text-lg font-bold">×</div>
 
         {/* Matrix V^T */}
-        <div className="flex flex-col items-center gap-1">
-          <div className="text-[10px] text-muted font-sans font-medium">Vᵀ (Item Basis)</div>
+        <div className="flex flex-col items-center gap-1.5">
+          <div className="text-[10px] text-muted font-semibold">Vᵀ (Item Basis)</div>
           <div
             className={`relative rounded border transition-colors flex flex-col justify-between p-1.5 ${
               truncateK ? "border-blue-500/80 bg-blue-950/20" : "border-neutral-700 bg-neutral-900/60"
             }`}
-            style={{ width: "105px", height: "95px" }}
+            style={{ width: "130px", height: "110px" }}
           >
             <div className="flex justify-between text-[9px] text-neutral-400">
               <span>v₁</span>
@@ -106,7 +107,7 @@ export const DecompositionView: React.FC<DecompositionViewProps> = ({
               {rowsV} × {colsV}
             </div>
             <div className="flex justify-between text-[9px] text-neutral-500">
-              <span className="text-blue-400">{truncateK ? `k=${truncateK}` : ""}</span>
+              <span className="text-blue-400">{truncateK ? `k=${truncateK} kept` : ""}</span>
               <span>m₁</span>
             </div>
           </div>

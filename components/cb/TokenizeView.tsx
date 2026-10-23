@@ -25,31 +25,29 @@ export const TokenizeView: React.FC<TokenizeViewProps> = ({
   const catalogFirst = MOVIES.find((m) => !m.cold) ?? MOVIES[0];
   const catalogSecond = MOVIES.filter((m) => !m.cold)[1] ?? MOVIES[1];
 
+  // Feature two representative movies
   const featuredMovies = [
     {
       id: catalogFirst.id,
       title: catalogFirst.title,
-      year: catalogFirst.year,
       isCold: false,
-      desc: "Rated 5★ by Alex",
+      desc: "Catalog Movie (Rated 5★ by Alex)",
     },
     ...(coldStart && COLD_MOVIE
       ? [
           {
             id: COLD_MOVIE.id,
             title: COLD_MOVIE.title,
-            year: COLD_MOVIE.year,
             isCold: true,
-            desc: "0 ratings in dataset",
+            desc: "Cold-Start Item (0 ratings in dataset)",
           },
         ]
       : [
           {
             id: catalogSecond.id,
             title: catalogSecond.title,
-            year: catalogSecond.year,
             isCold: false,
-            desc: "Sci-Fi Catalog item",
+            desc: "Catalog Movie (Sci-Fi, rated 5★)",
           },
         ]),
   ];
@@ -64,67 +62,69 @@ export const TokenizeView: React.FC<TokenizeViewProps> = ({
     if (token.startsWith("cast:")) {
       return "bg-emerald-950/60 text-emerald-300 border-emerald-800/50";
     }
-    return "bg-neutral-800 text-neutral-300 border-neutral-700";
+    return "bg-amber-950/60 text-amber-300 border-amber-800/50";
   };
 
   return (
-    <div className="flex flex-col gap-2.5 p-3 bg-surface rounded border border-neutral-800 text-xs font-sans">
-      {/* Header */}
-      <div className="flex items-center justify-between border-b border-neutral-800 pb-1.5">
+    <div className="flex flex-col gap-3 p-3 bg-surface rounded-md border border-neutral-800 text-xs font-mono">
+      {/* Vocabulary Header */}
+      <div className="flex items-center justify-between border-b border-neutral-800 pb-2">
         <div className="flex items-center gap-2">
-          <span className="text-white font-semibold text-xs">
-            Feature Tokenization
+          <span className="text-white font-semibold font-sans text-xs">
+            Namespaced Feature Tokenization
           </span>
-          <span className="text-[10px] text-muted font-mono bg-neutral-900 px-1.5 py-0.2 rounded border border-neutral-800">
-            {effectiveVocabSize} Unique Tokens
+          <span className="text-[10px] text-accent bg-accent/10 px-2 py-0.5 rounded border border-accent/30 font-bold">
+            {effectiveVocabSize} Unique Terms in Vocab
           </span>
         </div>
-        <div className="flex items-center gap-2 text-[10px] font-mono text-neutral-400">
+        <div className="flex items-center gap-2 text-[10px] font-sans">
           <span className="text-blue-400">genre:</span>
           <span className="text-purple-400">dir:</span>
           <span className="text-emerald-400">cast:</span>
-          <span className="text-neutral-400">kw:</span>
+          <span className="text-amber-400">kw:</span>
         </div>
       </div>
 
-      {/* Featured Movies */}
-      <div className="flex flex-col gap-2">
+      {/* Featured Movie Token Chips */}
+      <div className="flex flex-col gap-3">
         {featuredMovies.map((feat) => {
+          const movie = MOVIES.find((m) => m.id === feat.id);
           const tokens = tokensByMovie[feat.id] ?? [];
+          const year = movie?.year ?? 2010;
 
           return (
             <div
               key={feat.id}
-              className={`p-2 rounded border flex flex-col gap-1.5 ${
+              className={`p-2.5 rounded border flex flex-col gap-2 ${
                 feat.isCold
                   ? "bg-amber-950/15 border-amber-800/40"
                   : "bg-neutral-900/60 border-neutral-800"
               }`}
             >
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1.5">
-                  <span className="text-white font-medium text-xs">
-                    {feat.title} ({feat.year})
+                <div className="flex items-center gap-2">
+                  <span className="text-white font-bold font-sans text-xs">
+                    {feat.title} ({year})
                   </span>
                   <span className="text-[10px] text-muted font-mono bg-neutral-900 px-1.5 py-0.2 rounded border border-neutral-800">
                     {feat.id}
                   </span>
                   {feat.isCold && (
-                    <span className="text-[9px] text-amber-400 bg-amber-950/60 px-1.5 py-0.2 rounded border border-amber-800/40 font-mono">
+                    <span className="text-[9px] bg-amber-500/20 text-amber-400 border border-amber-500/40 px-1.5 py-0.2 rounded font-bold font-sans">
                       NEW · 0 ratings
                     </span>
                   )}
                 </div>
-                <span className="text-[10px] text-muted">{feat.desc}</span>
+                <span className="text-[10px] text-muted font-sans">{feat.desc}</span>
               </div>
 
               {/* Tokens Cloud */}
-              <div className="flex flex-wrap gap-1 pt-0.5">
+              <div className="flex flex-wrap gap-1.5 pt-0.5">
                 {tokens.length > 0 ? (
                   tokens.map((tok) => (
                     <span
                       key={tok}
-                      className={`text-[10px] px-1.5 py-0.5 rounded border font-mono ${getNamespaceStyle(
+                      className={`text-[10px] px-2 py-0.5 rounded border font-mono ${getNamespaceStyle(
                         tok
                       )}`}
                     >
@@ -132,7 +132,7 @@ export const TokenizeView: React.FC<TokenizeViewProps> = ({
                     </span>
                   ))
                 ) : (
-                  <span className="text-neutral-500 text-[10px] italic">Extracting tokens...</span>
+                  <span className="text-neutral-500 text-[11px] italic">Extracting tokens...</span>
                 )}
               </div>
             </div>
@@ -140,8 +140,8 @@ export const TokenizeView: React.FC<TokenizeViewProps> = ({
         })}
       </div>
 
-      <div className="text-[10px] text-neutral-400">
-        Namespacing prefixes prevent token collisions across metadata attributes.
+      <div className="text-[11px] text-muted font-sans pt-1">
+        * Namespacing prefixes (e.g. <code className="text-neutral-300">dir:</code> vs <code className="text-neutral-300">cast:</code>) prevent collisions across metadata fields.
       </div>
     </div>
   );
