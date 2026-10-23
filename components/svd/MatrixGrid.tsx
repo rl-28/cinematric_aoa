@@ -71,7 +71,7 @@ export const MatrixGrid: React.FC<MatrixGridProps> = ({
               className={`w-11 shrink-0 text-center py-1 border-l border-dashed border-neutral-700/80 bg-neutral-900/40 flex flex-col items-center justify-end ${
                 activeCell?.movieId === coldMovie.id ? "text-accent font-bold" : "text-neutral-500"
               }`}
-              title="Cold Start Item: 0 ratings in dataset"
+              title={`${coldMovie.title} (${coldMovie.year}) - Cold Start: 0 ratings in dataset`}
             >
               <span className="text-[9px] text-amber-400 font-bold">COLD</span>
               <span className="text-[8px] text-neutral-500 font-sans">{coldMovie.id}</span>

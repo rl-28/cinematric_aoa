@@ -38,9 +38,6 @@ export default function SimulatePage() {
           <h1 className="text-white font-bold text-sm tracking-wide font-sans">
             Recommender Lab
           </h1>
-          <span className="hidden md:inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono bg-neutral-900 text-neutral-400 border border-neutral-800">
-            SVD vs. Content-Based Simulation
-          </span>
           <Link
             href="/"
             className="text-xs text-muted hover:text-white transition-colors ml-1 font-sans"
@@ -49,15 +46,12 @@ export default function SimulatePage() {
           </Link>
         </div>
 
-        {/* Target User Info & Dataset Context */}
-        <div className="flex items-center gap-3 text-xs">
-          <div className="flex items-center gap-2 bg-neutral-900 px-2.5 py-1 rounded border border-neutral-800">
+        {/* Target User Info */}
+        <div className="flex items-center gap-2 text-xs">
+          <div className="flex items-center gap-1.5 bg-neutral-900 px-2.5 py-1 rounded border border-neutral-800">
             <span className="text-muted text-[11px] font-sans">Target User:</span>
-            <span className="text-white font-mono font-semibold">
+            <span className="text-white font-sans font-semibold">
               {TARGET_USER.name.replace(" (Target)", "")}
-            </span>
-            <span className="text-[10px] text-accent bg-accent/10 px-1.5 py-0.5 rounded border border-accent/30 font-medium">
-              Target
             </span>
           </div>
         </div>

@@ -124,6 +124,7 @@ export const LatentScatterView: React.FC<LatentScatterViewProps> = ({
           {/* Origin / Cold Start Movie (Chronopolis m14 when cold-start is ON) */}
           {coldMovie && (
             <>
+              <title>{coldMovie.title} ({coldMovie.year}) - Cold start: Q=[0, 0]</title>
               <circle cx={originX} cy={originY} r="5" fill="#F59E0B" opacity="0.9" />
               <circle
                 cx={originX}
@@ -140,9 +141,9 @@ export const LatentScatterView: React.FC<LatentScatterViewProps> = ({
                 fill="#FBBF24"
                 fontSize="9"
                 fontWeight="bold"
-                fontFamily="monospace"
+                fontFamily="sans-serif"
               >
-                {coldMovie.title} (Q=[0,0])
+                {coldMovie.title} ({coldMovie.year})
               </text>
             </>
           )}
@@ -157,6 +158,7 @@ export const LatentScatterView: React.FC<LatentScatterViewProps> = ({
 
             return (
               <g key={movie.id} className="transition-all cursor-pointer">
+                <title>{movie.title} ({movie.year}) - {movie.genres.join(", ")}</title>
                 <rect
                   x={cx - 3.5}
                   y={cy - 3.5}
