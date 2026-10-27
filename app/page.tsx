@@ -77,13 +77,13 @@ function LandingPageContent() {
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 border border-accent/25 text-accent text-xs font-mono font-semibold tracking-wider uppercase mb-6">
               <span className="w-2 h-2 rounded-full bg-accent" />
-              Interactive Recommender Explainer
+              Interactive Algorithm Lab &bull; SVD vs. Content-Based
             </div>
 
             <h1 className="text-4xl sm:text-6xl md:text-7xl font-black text-white tracking-tight leading-[1.08] mb-6 font-sans">
-              Recommendation Algorithms, <br />
-              <span className="text-accent underline decoration-accent/40 decoration-wavy decoration-2">
-                Unmasked
+              How Streaming Platforms <br />
+              <span className="text-accent">
+                Predict Your Taste
               </span>
             </h1>
 
