@@ -41,9 +41,9 @@ export function NetflixIntro({ onDismiss, introParam }: NetflixIntroProps) {
       audioCtxRef.current = null;
     }
 
-    // 3. Persist dismissal for session
+    // 3. Clear any session storage flag so page refresh always shows the Click to Begin page
     try {
-      sessionStorage.setItem("cinemetric_intro_dismissed", "true");
+      sessionStorage.removeItem("cinemetric_intro_dismissed");
     } catch {
       // Storage access blocked or unavailable
     }
@@ -52,7 +52,7 @@ export function NetflixIntro({ onDismiss, introParam }: NetflixIntroProps) {
     if (onDismiss) onDismiss();
   }, [onDismiss]);
 
-  // Client check: respect prefers-reduced-motion and sessionStorage
+  // Client check: always show "Click to Begin" gate on every page refresh
   useEffect(() => {
     try {
       const params = new URLSearchParams(window.location.search);
@@ -75,13 +75,8 @@ export function NetflixIntro({ onDismiss, introParam }: NetflixIntroProps) {
         return;
       }
 
-      const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      const alreadyDismissed = sessionStorage.getItem("cinemetric_intro_dismissed") === "true";
-
-      if (reducedMotion || alreadyDismissed) {
-        setStatus("done");
-        return;
-      }
+      // Always show gate on page refresh
+      setStatus("gate");
     } catch {
       // Fallback
     }
