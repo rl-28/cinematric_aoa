@@ -15,6 +15,8 @@ interface MatrixGridProps {
   activeCell?: { userIdx: number; itemIdx: number; movieId: string } | null;
   highlightTargetUser?: boolean;
   showColdStart?: boolean;
+  allPredictions?: number[][];
+  simulatedUserCount?: number;
 }
 
 export const MatrixGrid: React.FC<MatrixGridProps> = ({
@@ -26,6 +28,8 @@ export const MatrixGrid: React.FC<MatrixGridProps> = ({
   activeCell,
   highlightTargetUser = true,
   showColdStart = true,
+  allPredictions,
+  simulatedUserCount = 3,
 }) => {
   const catalogMovies = MOVIES.filter((m) => !m.cold);
   const coldMovie = showColdStart ? MOVIES.find((m) => m.cold) : null;
@@ -83,6 +87,7 @@ export const MatrixGrid: React.FC<MatrixGridProps> = ({
         <div className="flex flex-col divide-y divide-neutral-900/80">
           {USERS.map((user, rowIdx) => {
             const isTarget = user.id === TARGET_USER_ID;
+            const isSimulated = rowIdx < simulatedUserCount;
             const isRowActive = activeCell?.userIdx === rowIdx;
 
             return (
@@ -91,6 +96,8 @@ export const MatrixGrid: React.FC<MatrixGridProps> = ({
                 className={`flex items-center transition-colors duration-150 ${
                   isTarget && highlightTargetUser
                     ? "bg-accent/10 border-y border-accent/40"
+                    : isSimulated
+                    ? "bg-amber-950/10 border-y border-amber-800/25"
                     : isRowActive
                     ? "bg-neutral-800/40"
                     : "hover:bg-neutral-900/40"
@@ -99,15 +106,26 @@ export const MatrixGrid: React.FC<MatrixGridProps> = ({
                 {/* User Row Label */}
                 <div
                   className="w-24 shrink-0 px-2 py-1 flex items-center justify-between"
-                  title={`${user.name} (${user.cluster})`}
+                  title={`${user.name} (${user.cluster}) - ${isTarget ? "Target User" : isSimulated ? "Simulated Cohort" : "Community"}`}
                 >
                   <span
                     className={`truncate text-[11px] font-sans ${
-                      isTarget ? "text-accent font-bold" : "text-neutral-300"
+                      isTarget ? "text-accent font-bold" : isSimulated ? "text-amber-300 font-semibold" : "text-neutral-300"
                     }`}
                   >
                     {user.name.split(" ")[0]}
                   </span>
+                  {isSimulated && (
+                    <span
+                      className={`text-[8px] font-mono px-1 rounded ${
+                        isTarget
+                          ? "bg-accent/20 text-accent font-bold"
+                          : "bg-amber-950/60 text-amber-400 font-semibold border border-amber-800/40"
+                      }`}
+                    >
+                      {isTarget ? "Tgt" : `Sim ${rowIdx + 1}`}
+                    </span>
+                  )}
                   {/* bu glyph if in baseline mode */}
                   {mode === "baseline" && baseline && (
                     <span
@@ -128,8 +146,11 @@ export const MatrixGrid: React.FC<MatrixGridProps> = ({
                   const resVal = residualMatrix?.[rowIdx]?.[colIdx];
                   const isCellActive =
                     activeCell?.userIdx === rowIdx && activeCell?.itemIdx === colIdx;
-                  const predictedInfo =
-                    isTarget && predictedMap ? predictedMap.get(m.id) : undefined;
+                  
+                  // Lookup predictions for simulated users
+                  const predictedInfo = isSimulated && predictedMap
+                    ? (predictedMap.get(`${rowIdx}-${m.id}`) || (isTarget ? predictedMap.get(m.id) : undefined))
+                    : undefined;
 
                   // Render Cell content based on mode
                   let cellContent: React.ReactNode = "-";
@@ -174,7 +195,14 @@ export const MatrixGrid: React.FC<MatrixGridProps> = ({
                       cellContent = predictedInfo.prediction.toFixed(1);
                       cellClass = isCellActive
                         ? "text-accent font-bold bg-accent/30 ring-2 ring-accent"
-                        : "text-amber-300 font-medium bg-amber-950/30 border border-amber-600/40";
+                        : isTarget
+                        ? "text-amber-300 font-medium bg-amber-950/30 border border-amber-600/40"
+                        : "text-amber-200/90 font-medium bg-amber-950/20 border border-amber-800/30";
+                    } else if (isSimulated && allPredictions && allPredictions[rowIdx]?.[colIdx] !== undefined) {
+                      cellContent = allPredictions[rowIdx][colIdx].toFixed(1);
+                      cellClass = isTarget
+                        ? "text-amber-300 font-medium bg-amber-950/30 border border-amber-600/40"
+                        : "text-amber-200/90 font-medium bg-amber-950/20 border border-amber-800/30";
                     } else {
                       cellContent = "?";
                       cellClass = "text-neutral-700 bg-neutral-950/40";
@@ -190,7 +218,7 @@ export const MatrixGrid: React.FC<MatrixGridProps> = ({
                       key={m.id}
                       className={`w-9 h-7 shrink-0 flex items-center justify-center rounded-[2px] m-[1px] transition-all duration-200 ${cellClass}`}
                       title={`User: ${user.name}, Movie: ${m.title} ${
-                        rawVal !== null ? `(Rating: ${rawVal})` : "(Unrated)"
+                        rawVal !== null ? `(Rating: ${rawVal})` : `(Predicted: ${cellContent})`
                       }`}
                     >
                       {cellContent}
@@ -199,26 +227,38 @@ export const MatrixGrid: React.FC<MatrixGridProps> = ({
                 })}
 
                 {/* Cold Column */}
-                {coldMovie && (
-                  <div
-                    className={`w-11 h-7 shrink-0 border-l border-dashed border-neutral-700/80 flex items-center justify-center m-[1px] ${
-                      activeCell?.userIdx === rowIdx && activeCell?.movieId === coldMovie.id
-                        ? "bg-accent/25 text-accent ring-2 ring-accent font-bold"
-                        : isTarget && predictedMap?.has(coldMovie.id)
-                        ? "bg-amber-950/25 text-amber-400 font-medium"
-                        : "bg-neutral-950/60 text-neutral-600"
-                    }`}
-                    title={
-                      isTarget && predictedMap?.has(coldMovie.id)
-                        ? `${coldMovie.title} fallback prediction: ${predictedMap.get(coldMovie.id)?.prediction.toFixed(1)}`
-                        : "Cold start movie: 0 observed ratings"
-                    }
-                  >
-                    {isTarget && predictedMap?.has(coldMovie.id)
-                      ? predictedMap.get(coldMovie.id)?.prediction.toFixed(1)
-                      : "∅"}
-                  </div>
-                )}
+                {coldMovie && (() => {
+                  const coldPredInfo = isSimulated && predictedMap
+                    ? (predictedMap.get(`${rowIdx}-${coldMovie.id}`) || (isTarget ? predictedMap.get(coldMovie.id) : undefined))
+                    : undefined;
+                  const hasColdPred = Boolean(coldPredInfo || (isSimulated && baseline));
+                  const coldPredVal = coldPredInfo
+                    ? coldPredInfo.prediction.toFixed(1)
+                    : baseline
+                    ? (baseline.mu + baseline.bu[rowIdx]).toFixed(1)
+                    : "∅";
+
+                  return (
+                    <div
+                      className={`w-11 h-7 shrink-0 border-l border-dashed border-neutral-700/80 flex items-center justify-center m-[1px] ${
+                        activeCell?.userIdx === rowIdx && activeCell?.movieId === coldMovie.id
+                          ? "bg-accent/25 text-accent ring-2 ring-accent font-bold"
+                          : hasColdPred
+                          ? isTarget
+                            ? "bg-amber-950/30 text-amber-400 font-medium"
+                            : "bg-amber-950/20 text-amber-300/80 font-medium"
+                          : "bg-neutral-950/60 text-neutral-600"
+                      }`}
+                      title={
+                        hasColdPred
+                          ? `${coldMovie.title} fallback prediction: ${coldPredVal}`
+                          : "Cold start movie: 0 observed ratings"
+                      }
+                    >
+                      {hasColdPred ? coldPredVal : "∅"}
+                    </div>
+                  );
+                })()}
               </div>
             );
           })}

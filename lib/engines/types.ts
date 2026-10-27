@@ -22,6 +22,15 @@ export type SvdStepKind =
   | "dot_product"
   | "rank";
 
+export interface UserPredictionDetail {
+  userIdx: number;
+  userName: string;
+  prediction: number;
+  bias: number;
+  runningSum: number;
+  coldFallback?: boolean;
+}
+
 export interface SvdDotProductPayload {
   userIdx: number;
   itemIdx: number;
@@ -34,6 +43,7 @@ export interface SvdDotProductPayload {
   bias: number;
   prediction: number;
   coldFallback?: boolean;
+  cohortPredictions?: UserPredictionDetail[];
 }
 
 export interface SvdRecommendation {

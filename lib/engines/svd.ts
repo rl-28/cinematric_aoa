@@ -259,10 +259,27 @@ export function runSvd(
 
     const tDot = performance.now();
 
+    // Compute cohort predictions for the first 3 users (Alex, Jordan, Taylor)
+    const simulatedCount = Math.min(3, users.length);
+    const cohortPredictions = [];
+
     if (movie.cold) {
       // Cold-start movie: zero ratings, no row in Q
       // Fallback: baseline prediction = μ + b_u (+ 0 item bias)
       const baselinePred = Math.min(5.0, Math.max(1.0, Number((mu + bu[targetUserIdx]).toFixed(3))));
+
+      for (let u = 0; u < simulatedCount; u++) {
+        const uBaseline = Number((mu + bu[u]).toFixed(3));
+        cohortPredictions.push({
+          userIdx: u,
+          userName: users[u].name.split(" ")[0],
+          prediction: Math.min(5.0, Math.max(1.0, uBaseline)),
+          bias: uBaseline,
+          runningSum: 0,
+          coldFallback: true,
+        });
+      }
+
       const payload: SvdDotProductPayload = {
         userIdx: targetUserIdx,
         itemIdx: -1,
@@ -275,6 +292,7 @@ export function runSvd(
         bias: Number((mu + bu[targetUserIdx]).toFixed(3)),
         prediction: baselinePred,
         coldFallback: true,
+        cohortPredictions,
       };
 
       steps.push({
@@ -310,6 +328,23 @@ export function runSvd(
       const bias = mu + bu[targetUserIdx] + bi[catalogIdx];
       const pred = Math.min(5.0, Math.max(1.0, Number((bias + runningSum).toFixed(3))));
 
+      for (let u = 0; u < simulatedCount; u++) {
+        let uDot = 0;
+        for (let f = 0; f < actualK; f++) {
+          uDot += P[u][f] * qRow[f];
+        }
+        const uBias = mu + bu[u] + bi[catalogIdx];
+        const uPred = Math.min(5.0, Math.max(1.0, Number((uBias + uDot).toFixed(3))));
+        cohortPredictions.push({
+          userIdx: u,
+          userName: users[u].name.split(" ")[0],
+          prediction: uPred,
+          bias: Number(uBias.toFixed(3)),
+          runningSum: Number(uDot.toFixed(4)),
+          coldFallback: false,
+        });
+      }
+
       const payload: SvdDotProductPayload = {
         userIdx: targetUserIdx,
         itemIdx: catalogIdx,
@@ -322,6 +357,7 @@ export function runSvd(
         bias: Number(bias.toFixed(3)),
         prediction: pred,
         coldFallback: false,
+        cohortPredictions,
       };
 
       steps.push({

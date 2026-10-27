@@ -49,7 +49,7 @@ export const ControlBar: React.FC = () => {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [store]);
 
-  const speeds: PlaybackSpeed[] = [0.5, 1, 2, 4];
+  const speeds: PlaybackSpeed[] = [0.1, 0.25, 0.5, 1, 2, 4];
   const demoUsers = store.benchmark.cache["demo"]?.numUsers ?? 10;
   const demoMovies = store.benchmark.cache["demo"]?.numMovies ?? 14;
   const scales: { id: DatasetScale; label: string; tooltip: string }[] = [

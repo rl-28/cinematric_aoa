@@ -203,11 +203,24 @@ export function predictedCellsAtTick(state: SimState): Map<string, PredictedCell
     const s = steps[i];
     if (s.kind === "dot_product") {
       map.set(s.payload.movieId, {
+        userIdx: s.payload.userIdx,
         movieId: s.payload.movieId,
         itemIdx: s.payload.itemIdx,
         prediction: s.payload.prediction,
         coldFallback: s.payload.coldFallback,
       });
+
+      if (s.payload.cohortPredictions) {
+        for (const cp of s.payload.cohortPredictions) {
+          map.set(`${cp.userIdx}-${s.payload.movieId}`, {
+            userIdx: cp.userIdx,
+            movieId: s.payload.movieId,
+            itemIdx: s.payload.itemIdx,
+            prediction: cp.prediction,
+            coldFallback: cp.coldFallback,
+          });
+        }
+      }
     }
   }
   return map;

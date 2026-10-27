@@ -148,6 +148,33 @@ export const DotProductHero: React.FC<DotProductHeroProps> = ({ payload }) => {
             <span className="text-[10px] text-neutral-400 font-normal font-sans">/ 5.0</span>
           </motion.div>
         </div>
+
+        {/* Multi-User Simulated Cohort Predictions (Alex, Jordan, Taylor) */}
+        {payload.cohortPredictions && payload.cohortPredictions.length > 0 && (
+          <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-neutral-800">
+            <span className="text-[10px] text-muted font-sans font-semibold uppercase tracking-wider">
+              Simulating 3 Rows:
+            </span>
+            {payload.cohortPredictions.map((cp) => (
+              <div
+                key={cp.userIdx}
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-[11px] font-mono border ${
+                  cp.userIdx === 0
+                    ? "bg-accent/15 border-accent/50 text-white shadow-sm"
+                    : "bg-neutral-900 border-neutral-800 text-neutral-300"
+                }`}
+              >
+                <span className={cp.userIdx === 0 ? "text-accent font-bold" : "text-amber-300 font-semibold"}>
+                  {cp.userName}:
+                </span>
+                <span className="text-white font-bold">r̂ = {cp.prediction.toFixed(2)}</span>
+                <span className="text-[9px] text-neutral-500">
+                  ({cp.bias.toFixed(1)} + {cp.runningSum.toFixed(2)})
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {coldFallback && (

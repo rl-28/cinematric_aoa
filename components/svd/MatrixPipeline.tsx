@@ -209,9 +209,9 @@ export const MatrixPipeline: React.FC = () => {
                 <DotProductHero payload={currentStep.payload} />
                 <div className="flex flex-col gap-1.5">
                   <div className="flex justify-between text-[11px] text-muted font-sans px-1">
-                    <span>Target Row Predictions Light Up</span>
+                    <span>Target & Cohort Predictions Light Up (Simulating 3 Rows: Alex, Jordan, Taylor)</span>
                     <span className="text-amber-300 font-mono">
-                      {predictedMap.size} unrated item(s) evaluated
+                      {predictedMap.size} evaluated
                     </span>
                   </div>
                   <MatrixGrid
@@ -219,6 +219,8 @@ export const MatrixPipeline: React.FC = () => {
                     rawMatrix={rawMatrix}
                     predictedMap={predictedMap}
                     showColdStart={store.coldStart}
+                    simulatedUserCount={3}
+                    allPredictions={store.svdResult?.predictions}
                     activeCell={{
                       userIdx: currentStep.payload.userIdx,
                       itemIdx: currentStep.payload.itemIdx,
@@ -237,14 +239,17 @@ export const MatrixPipeline: React.FC = () => {
                   unrankable={currentStep.payload.unrankable}
                 />
                 <div className="flex flex-col gap-1.5 opacity-80">
-                  <div className="text-[11px] text-muted font-sans px-1">
-                    Final Observed & Predicted Rating Matrix
+                  <div className="flex justify-between items-center text-[11px] text-muted font-sans px-1">
+                    <span>Final Observed & Predicted Matrix (Simulated Rows: Alex, Jordan, Taylor)</span>
+                    <span className="text-accent text-[10px] font-mono">Top 3 Rows Populated</span>
                   </div>
                   <MatrixGrid
                     mode="predictions"
                     rawMatrix={rawMatrix}
                     predictedMap={predictedMap}
                     showColdStart={store.coldStart}
+                    simulatedUserCount={3}
+                    allPredictions={store.svdResult?.predictions}
                   />
                 </div>
               </div>

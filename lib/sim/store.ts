@@ -27,7 +27,7 @@ import {
 } from "../engines/types";
 import { totalTicks } from "./selectors";
 
-export type PlaybackSpeed = 0.5 | 1 | 2 | 4;
+export type PlaybackSpeed = 0.1 | 0.25 | 0.5 | 1 | 2 | 4;
 export type DatasetScale = "demo" | "100" | "500x300";
 
 export interface BenchmarkState {
