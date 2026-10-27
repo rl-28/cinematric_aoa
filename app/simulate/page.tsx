@@ -4,7 +4,6 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useSimStore } from "@/lib/sim/store";
 import { useReplay } from "@/lib/sim/useReplay";
-import { TARGET_USER } from "@/lib/data/ratings";
 import { MatrixPipeline } from "@/components/svd/MatrixPipeline";
 import { VectorGraph } from "@/components/cb/VectorGraph";
 import { ControlBar } from "@/components/ui/ControlBar";
@@ -102,7 +101,7 @@ export default function SimulatePage() {
           </button>
         </div>
 
-        {/* Right Section: Interactive Sandbox Link & Target User Info */}
+        {/* Right Section: Interactive Sandbox Link */}
         <div className="flex items-center gap-2 text-xs">
           {/* Link to Dedicated Interactive Session */}
           <Link
@@ -116,14 +115,6 @@ export default function SimulatePage() {
             <span>Interactive Sandbox</span>
             <span className="text-[10px] bg-accent/20 text-accent border border-accent/40 px-1 rounded font-mono font-normal">Custom Input</span>
           </Link>
-
-          {/* Target User Info */}
-          <div className="hidden md:flex items-center gap-1.5 bg-neutral-900 px-2.5 py-1 rounded border border-neutral-800">
-            <span className="text-muted text-[11px] font-sans">Target:</span>
-            <span className="text-white font-sans font-semibold">
-              {TARGET_USER.name.replace(" (Target)", "")}
-            </span>
-          </div>
         </div>
       </header>
 
