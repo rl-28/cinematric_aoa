@@ -55,7 +55,7 @@ export const RankView: React.FC<RankViewProps> = ({
 
               <div className="flex items-center gap-2">
                 <div className="flex items-center gap-1 bg-neutral-950 px-2.5 py-1 rounded border border-neutral-800 font-mono text-amber-300 font-bold">
-                  <span className="text-accent text-xs">★</span>
+                  <span className="text-[11px] text-accent font-mono uppercase tracking-wider font-semibold">r̂ =</span>
                   <span>{rec.score.toFixed(2)}</span>
                 </div>
               </div>

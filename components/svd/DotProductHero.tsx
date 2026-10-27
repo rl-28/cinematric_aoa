@@ -143,7 +143,7 @@ export const DotProductHero: React.FC<DotProductHeroProps> = ({ payload }) => {
             animate={{ scale: 1, opacity: 1 }}
             className="flex items-center gap-1.5 px-3 py-1 rounded bg-accent/20 border border-accent/60 text-white font-bold text-base shadow-sm shadow-accent/40"
           >
-            <span className="text-accent">★</span>
+            <span className="text-[11px] text-accent font-mono uppercase tracking-wider font-semibold">r̂ =</span>
             <span>{prediction.toFixed(2)}</span>
             <span className="text-[10px] text-neutral-400 font-normal font-sans">/ 5.0</span>
           </motion.div>

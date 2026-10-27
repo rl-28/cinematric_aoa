@@ -31,7 +31,7 @@ export const TokenizeView: React.FC<TokenizeViewProps> = ({
       id: catalogFirst.id,
       title: catalogFirst.title,
       isCold: false,
-      desc: "Catalog Movie (Rated 5★ by Alex)",
+      desc: "Catalog Movie (Rated 5.0 by Alex)",
     },
     ...(coldStart && COLD_MOVIE
       ? [
@@ -47,7 +47,7 @@ export const TokenizeView: React.FC<TokenizeViewProps> = ({
             id: catalogSecond.id,
             title: catalogSecond.title,
             isCold: false,
-            desc: "Catalog Movie (Sci-Fi, rated 5★)",
+            desc: "Catalog Movie (Sci-Fi, rated 5.0)",
           },
         ]),
   ];

@@ -16,6 +16,7 @@ import { DecompositionView } from "./DecompositionView";
 import { LatentScatterView } from "./LatentScatterView";
 import { DotProductHero } from "./DotProductHero";
 import { RankView } from "./RankView";
+import { SvdStepExplainer } from "./SvdStepExplainer";
 
 export const MatrixPipeline: React.FC = () => {
   const store = useSimStore();
@@ -105,7 +106,9 @@ export const MatrixPipeline: React.FC = () => {
       {/* Active Stage Body (Pure function of store.tick)          */}
       {/* ========================================================= */}
       <div className="flex-1 p-3.5 overflow-y-auto">
-        <div key={`${kind}-${currentIdx}`} className="flex flex-col gap-4">
+        <div key={`${kind}-${currentIdx}`} className="flex flex-col gap-3">
+          {/* Step Math & Calculation Explainer */}
+          <SvdStepExplainer step={currentStep} stepIndex={currentIdx} totalSteps={totalSvdSteps} />
           {/* Stage 1: Load */}
             {kind === "load" && (
               <div className="flex flex-col gap-3">

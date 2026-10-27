@@ -74,9 +74,12 @@ export const ControlBar: React.FC = () => {
             onClick={store.reset}
             aria-label="Reset simulation to tick 0 (Shortcut: R)"
             title="Reset to start [R]"
-            className="w-8 h-8 rounded bg-neutral-900 hover:bg-neutral-800 active:scale-95 text-neutral-300 hover:text-white border border-neutral-800 flex items-center justify-center font-mono text-sm transition-all focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none"
+            className="w-8 h-8 rounded bg-neutral-900 hover:bg-neutral-800 active:scale-95 text-neutral-300 hover:text-white border border-neutral-800 flex items-center justify-center transition-all focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none"
           >
-            ⏮
+            <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
+              <polygon points="19 20 9 12 19 4 19 20" />
+              <line x1="5" y1="19" x2="5" y2="5" />
+            </svg>
           </button>
 
           {/* Step Back */}
@@ -84,10 +87,12 @@ export const ControlBar: React.FC = () => {
             onClick={store.stepBack}
             disabled={store.tick <= 0}
             aria-label="Step back one tick (Shortcut: Left Arrow)"
-            title="Step back [←]"
-            className="px-2.5 h-8 rounded bg-neutral-900 hover:bg-neutral-800 active:scale-95 disabled:opacity-30 disabled:pointer-events-none text-neutral-300 hover:text-white border border-neutral-800 text-xs font-mono transition-all focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none"
+            title="Step back [<-]"
+            className="w-8 h-8 rounded bg-neutral-900 hover:bg-neutral-800 active:scale-95 disabled:opacity-30 disabled:pointer-events-none text-neutral-300 hover:text-white border border-neutral-800 flex items-center justify-center transition-all focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none"
           >
-            ◀
+            <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
+              <polygon points="17 4 7 12 17 20 17 4" />
+            </svg>
           </button>
 
           {/* Play / Pause Toggle */}
@@ -101,7 +106,22 @@ export const ControlBar: React.FC = () => {
                 : "bg-accent hover:bg-red-600 text-white"
             }`}
           >
-            {store.playing ? "⏸ Pause" : "▶ Play"}
+            {store.playing ? (
+              <>
+                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
+                  <rect x="6" y="4" width="4" height="16" rx="1" />
+                  <rect x="14" y="4" width="4" height="16" rx="1" />
+                </svg>
+                <span>Pause</span>
+              </>
+            ) : (
+              <>
+                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
+                  <polygon points="6 4 20 12 6 20 6 4" />
+                </svg>
+                <span>Play</span>
+              </>
+            )}
           </button>
 
           {/* Step Forward */}
@@ -109,10 +129,12 @@ export const ControlBar: React.FC = () => {
             onClick={store.stepForward}
             disabled={store.tick >= maxTick}
             aria-label="Step forward one tick (Shortcut: Right Arrow)"
-            title="Step forward [→]"
-            className="px-2.5 h-8 rounded bg-neutral-900 hover:bg-neutral-800 active:scale-95 disabled:opacity-30 disabled:pointer-events-none text-neutral-300 hover:text-white border border-neutral-800 text-xs font-mono transition-all focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none"
+            title="Step forward [->]"
+            className="w-8 h-8 rounded bg-neutral-900 hover:bg-neutral-800 active:scale-95 disabled:opacity-30 disabled:pointer-events-none text-neutral-300 hover:text-white border border-neutral-800 flex items-center justify-center transition-all focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none"
           >
-            ▶
+            <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
+              <polygon points="7 4 17 12 7 20 7 4" />
+            </svg>
           </button>
         </div>
 

@@ -16,6 +16,7 @@ import { TokenizeView } from "./TokenizeView";
 import { TfidfView } from "./TfidfView";
 import { CompareCard } from "./CompareCard";
 import { RankListView } from "./RankListView";
+import { ContentStepExplainer } from "./ContentStepExplainer";
 
 export const VectorGraph: React.FC = () => {
   const store = useSimStore();
@@ -160,6 +161,8 @@ export const VectorGraph: React.FC = () => {
       {/* Scrollable Body: Active Stage Card + 2D SVG PCA Canvas   */}
       {/* ========================================================= */}
       <div className="flex-1 p-3.5 overflow-y-auto flex flex-col gap-3">
+        {/* Step Math & Calculation Explainer */}
+        <ContentStepExplainer step={currentStep} stepIndex={currentIdx} totalSteps={totalCbSteps} />
         {/* Stage-Specific Detail Cards */}
         {kind === "tokenize" && currentStep && currentStep.kind === "tokenize" && (
           <TokenizeView
@@ -191,7 +194,7 @@ export const VectorGraph: React.FC = () => {
                 return (
                   <React.Fragment key={id}>
                     <strong className="text-emerald-400">
-                      {m ? m.title : id} ({weight}★)
+                      {m ? m.title : id} (Rating: {weight})
                     </strong>
                     {!isLast ? (idx === currentStep.payload.ratedMovieIds.length - 2 ? ", and " : ", ") : "."}
                   </React.Fragment>
