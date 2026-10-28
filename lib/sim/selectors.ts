@@ -187,6 +187,7 @@ export function revealedContentRecommendations(
  * Purely derived by scanning svdSteps[0..currentTick].
  */
 export interface PredictedCellInfo {
+  userIdx?: number;
   movieId: string;
   itemIdx: number;
   prediction: number;
